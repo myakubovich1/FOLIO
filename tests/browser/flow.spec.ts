@@ -72,8 +72,21 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
   });
   await expect(nextMonth).toBeFocused();
   await expect(nextMonth).toHaveAttribute("aria-pressed", "true");
+  await expect(nextMonth).toHaveAccessibleDescription(
+    `External income ${exactMoney(second.income)}. Spending before refunds ${exactMoney(second.spending)}. Refunds ${exactMoney(second.refunds)}.`,
+  );
   await expect(inspector).toContainText(monthName(second.month));
   await expect(inspector).toContainText(exactMoney(second.income));
+  if (info.project.name === "mobile") {
+    const last = assessed.monthly.at(-1);
+    await page
+      .getByRole("button", { name: `View ${monthName(last.month)} cash flow` })
+      .tap();
+    await expect(inspector).toContainText(monthName(last.month));
+    expect(
+      await page.locator(".cashflow-scroll").evaluate((el) => el.scrollLeft),
+    ).toBeGreaterThan(0);
+  }
 
   await page.screenshot({
     path: `test-results/${info.project.name}-assessment.png`,
@@ -189,6 +202,39 @@ test("profile switches keep currency and assessment attached to the selected bor
     await page.getByRole("button", { name: "Use saved records" }).click();
     await page.getByRole("button", { name: "See assessment →" }).click();
     await expect(page.locator(".score")).toContainText(score);
+    const monthly = (await (await page.request.get("/api/state")).json())
+      .assessment.monthly;
+    const peak = Math.max(
+      ...monthly.flatMap((row: { income: number; spending: number }) => [
+        row.income,
+        row.spending,
+      ]),
+      1,
+    );
+    const bars = await page.locator(".plot-month").evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const plot = button.querySelector(".plot-bars")!;
+        return {
+          scale: plot.getBoundingClientRect().height,
+          heights: Array.from(plot.children).map(
+            (bar) => bar.getBoundingClientRect().height,
+          ),
+        };
+      }),
+    );
+    expect(bars).toHaveLength(monthly.length);
+    monthly.forEach(
+      (row: { income: number; spending: number }, index: number) => {
+        for (const [series, value] of [row.income, row.spending].entries()) {
+          expect(
+            Math.abs(
+              bars[index].heights[series] - (bars[index].scale * value) / peak,
+            ),
+          ).toBeLessThan(0.8);
+        }
+      },
+    );
+
     await expect(page.getByText(`${currency} · revision 1`)).toBeVisible();
     expect(
       await page.evaluate(
@@ -233,4 +279,63 @@ test("loading, empty search, contradictory correction and profile-choice refresh
   await expect(
     page.getByRole("heading", { name: /Credit beyond/ }),
   ).toBeVisible();
+});
+
+test("analytics mismatch, unavailable and empty responses retain the matching assessment summary", async ({
+  page,
+}) => {
+  let response = 0;
+  await page.route("**/api/cashflow", async (route) => {
+    response++;
+    if (response === 1)
+      return route.fulfill({
+        json: {
+          backend: "Unmatched analytics fixture",
+          rows: [{ month: "2025-01", income: 1, spending: 0, refunds: 0 }],
+        },
+      });
+    if (response === 2)
+      return route.fulfill({
+        status: 503,
+        json: { error: "Analytics fixture unavailable" },
+      });
+    if (response === 3)
+      return route.fulfill({
+        json: { backend: "Empty analytics fixture", rows: [] },
+      });
+    return route.fulfill({
+      json: {
+        backend: "Matching analytics fixture",
+        rows: (await (await page.request.get("/api/state")).json()).assessment
+          .monthly,
+      },
+    });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: /Build your demo/ }).click();
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Use saved records" }).click();
+  await page.getByRole("button", { name: "See assessment →" }).click();
+  await expect(
+    page.getByText(/Analytics does not match this assessment revision/),
+  ).toBeVisible();
+  await expect(page.locator(".month-inspector")).toContainText("$4,300");
+  await expect(
+    page.getByText(/Calculated from the current reviewed records/),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Unmatched analytics fixture", { exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Retry analytics" }).click();
+  await expect(page.getByText(/Analytics is unavailable/)).toBeVisible();
+  await page.getByRole("button", { name: "Retry analytics" }).click();
+  await expect(
+    page.getByText(/Analytics does not match this assessment revision/),
+  ).toBeVisible();
+  await expect(page.locator(".plot-month")).toHaveCount(12);
+  await page.getByRole("button", { name: "Retry analytics" }).click();
+  await expect(page.getByText(/Matching analytics fixture/)).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Retry analytics" }),
+  ).toHaveCount(0);
 });

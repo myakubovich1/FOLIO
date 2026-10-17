@@ -26,7 +26,7 @@
 }
 .index-progress {
   stroke: var(--ring-color);
-  stroke-linecap: round;
+  stroke-linecap: butt;
   transition: stroke-dasharray 300ms ease;
 }
 .index-inner {

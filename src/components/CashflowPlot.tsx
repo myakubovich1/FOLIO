@@ -110,11 +110,17 @@ export function CashflowPlot({
                 className="plot-month"
                 aria-label={`View ${monthLabel(row.month)} cash flow`}
                 aria-pressed={current.month === row.month}
+                aria-describedby={`${hintId}-${row.month}`}
                 tabIndex={current.month === row.month ? 0 : -1}
                 onClick={() => setSelected(row.month)}
                 onFocus={() => setSelected(row.month)}
                 onKeyDown={navigateMonth}
               >
+                <span id={`${hintId}-${row.month}`} hidden>
+                  External income {money(row.income, currency)}. Spending before
+                  refunds {money(row.spending, currency)}. Refunds{" "}
+                  {money(row.refunds, currency)}.
+                </span>
                 <span className="plot-bars" aria-hidden="true">
                   <i style={{ height: `${(row.income / scale) * 100}%` }} />
                   <i style={{ height: `${(row.spending / scale) * 100}%` }} />
@@ -132,12 +138,7 @@ export function CashflowPlot({
         Amounts in {currency} · shared scale, zero baseline. Select a month for
         exact figures, or use the left and right arrow keys.
       </figcaption>
-      <div
-        className="month-inspector"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div className="month-inspector">
         <strong className="inspector-month">{monthLabel(current.month)}</strong>
         <dl>
           <div>
@@ -145,7 +146,7 @@ export function CashflowPlot({
             <dd>{money(current.income, currency)}</dd>
           </div>
           <div>
-            <dt>Recorded spending</dt>
+            <dt>Spending before refunds</dt>
             <dd>{money(current.spending, currency)}</dd>
           </div>
           <div>

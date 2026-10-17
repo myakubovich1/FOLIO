@@ -124,6 +124,7 @@ function Evidence({
   );
 }
 function Cashflow({ assessment }: { assessment: Assessment }) {
+  const [retryAttempt, setRetryAttempt] = useState(0);
   const [rows, setRows] = useState(assessment.monthly),
     [source, setSource] = useState(
       "Calculated from the current reviewed records",
@@ -132,6 +133,7 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
   useEffect(() => {
     const controller = new AbortController();
     setRows(assessment.monthly);
+    setSource("Calculated from the current reviewed records");
     setError("");
     api<{ backend: string; rows: Assessment["monthly"] }>(
       "cashflow",
@@ -140,17 +142,37 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
       controller.signal,
     )
       .then((result) => {
+        if (controller.signal.aborted) return;
+        const matches =
+          result.rows.length === assessment.monthly.length &&
+          result.rows.every((row, index) => {
+            const expected = assessment.monthly[index];
+            return (
+              row.month === expected.month &&
+              row.income === expected.income &&
+              row.spending === expected.spending &&
+              row.refunds === expected.refunds
+            );
+          });
+        if (!matches) {
+          setError(
+            "Analytics does not match this assessment revision. Showing the current deterministic summary; reload to refresh your assessment.",
+          );
+          return;
+        }
         setRows(result.rows);
         setSource(result.backend);
       })
       .catch((e) => {
-        if (e.name !== "AbortError")
+        if (!controller.signal.aborted && e.name !== "AbortError") {
+          setSource("Calculated from the current reviewed records");
           setError(
-            "Analytics is unavailable. Showing the current deterministic assessment summary; retry by reopening this page.",
+            "Analytics is unavailable. Showing the current deterministic assessment summary.",
           );
+        }
       });
     return () => controller.abort();
-  }, [assessment.revision, assessment.model]);
+  }, [assessment.revision, assessment.model, retryAttempt]);
   return (
     <section className="card">
       <div className="split">
@@ -161,11 +183,21 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
         Income and recorded spending over the observed period. Transfers and
         borrowing are excluded from income.
       </p>
-      {error && <p className="caution">{error}</p>}
+      {error && (
+        <div className="caution">
+          {error}
+          <button
+            className="quiet"
+            onClick={() => setRetryAttempt((n) => n + 1)}
+          >
+            Retry analytics
+          </button>
+        </div>
+      )}
       <CashflowPlot
         rows={rows}
         currency={assessment.currency}
-        incomplete={assessment.score === null}
+        incomplete={assessment.score === null || assessment.missing.length > 0}
       />
       <details>
         <summary>View exact monthly figures</summary>
@@ -1277,6 +1309,11 @@ function AssessmentView({
       </section>
       <section className="card">
         <h2>What drives your result</h2>
+        {a.factors.length > 0 && (
+          <p className="fine">
+            Each bar shows points earned relative to that factor’s own maximum.
+          </p>
+        )}
         {a.factors.length ? (
           a.factors.map((f, index) => (
             <button

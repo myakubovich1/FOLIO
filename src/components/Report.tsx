@@ -62,6 +62,9 @@ export function Report({ passport: p }: { passport: Passport }) {
       {a.factors.length > 0 && (
         <section>
           <h3>What contributes to the index</h3>
+          <p className="fine">
+            Bars show points relative to each factor’s own maximum.
+          </p>
           {a.factors.map((f) => (
             <div className="factor report-factor" key={f.name}>
               <span className="factor-copy">
