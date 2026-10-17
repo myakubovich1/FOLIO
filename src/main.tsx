@@ -1008,10 +1008,11 @@ function App() {
                 state={state}
                 onState={setState}
                 health={health}
-                onDeleted={() => {
+                onDeleted={(message) => {
                   choose();
                   setNotice(
-                    "Your Folio workspace, derived records and links were deleted. Downloaded copies and external provider data cannot be recalled.",
+                    message ||
+                      "Your Folio data and sharing access were removed. Downloaded copies and external provider data cannot be recalled.",
                   );
                 }}
               />

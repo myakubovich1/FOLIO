@@ -20,7 +20,7 @@ export function Settings({
 }: {
   state: State;
   onState: (s: State) => void;
-  onDeleted: () => void;
+  onDeleted: (message?: string) => void;
   health: Health | null;
 }) {
   const [busy, setBusy] = useState(false),
@@ -216,8 +216,12 @@ export function Settings({
               disabled={busy || confirm !== "DELETE"}
               onClick={() =>
                 run(async () => {
-                  await api("data", "DELETE", { confirm: "DELETE" });
-                  onDeleted();
+                  const result = await api<{ message: string }>(
+                    "data",
+                    "DELETE",
+                    { confirm: "DELETE" },
+                  );
+                  onDeleted(result.message);
                 })
               }
             >

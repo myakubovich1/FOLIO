@@ -9,6 +9,7 @@ export function PassportBuilder({
   state: State;
   onState: (s: State) => void;
 }) {
+  const [previewAttempt, setPreviewAttempt] = useState(0);
   const [factors, setFactors] = useState(true),
     [cashflow, setCashflow] = useState(true),
     [preview, setPreview] = useState<Passport | null>(null),
@@ -20,6 +21,7 @@ export function PassportBuilder({
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
+    setError("");
     setPreview(null);
     api<Passport>(
       "passports/preview",
@@ -35,7 +37,7 @@ export function PassportBuilder({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [state.revision, factors, cashflow]);
+  }, [state.revision, factors, cashflow, previewAttempt]);
   async function run(fn: () => Promise<void>) {
     setBusy(true);
     setError("");
@@ -82,6 +84,11 @@ export function PassportBuilder({
         {error && (
           <p role="alert" className="error">
             {error}
+            {!preview && !loading && (
+              <button onClick={() => setPreviewAttempt((n) => n + 1)}>
+                Retry recipient preview
+              </button>
+            )}
           </p>
         )}
         <button
