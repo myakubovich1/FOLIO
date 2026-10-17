@@ -1,0 +1,7 @@
+id,date,amount,currency,category,description,account_id,account_type,status,record_type,linked_record_id,coverage_start,coverage_end,coverage_complete,opening_balance,closing_balance,obligations_documented
+"limited-0-income","2025-01-10","2400.00","USD","income","External earnings","synthetic-limited","checking","posted","transaction","","2025-01-01","2025-02-12","false","10000.00","11860.00","true"
+"limited-0-rent","2025-01-03","-1140.00","USD","expense","Housing / premises","synthetic-limited","checking","posted","transaction","","2025-01-01","2025-02-12","false","10000.00","11860.00","true"
+"limited-0-living","2025-01-18","-760.00","USD","expense","Other documented expenses","synthetic-limited","checking","posted","transaction","","2025-01-01","2025-02-12","false","10000.00","11860.00","true"
+"limited-0-transfer","2025-01-22","100.00","USD","transfer","Transfer between own accounts","synthetic-limited","checking","posted","transaction","","2025-01-01","2025-02-12","false","10000.00","11860.00","true"
+"limited-1-income","2025-02-10","2400.00","USD","income","External earnings","synthetic-limited","checking","posted","transaction","","2025-01-01","2025-02-12","false","10000.00","11860.00","true"
+"limited-1-rent","2025-02-03","-1140.00","USD","expense","Housing / premises","synthetic-limited","checking","posted","transaction","","2025-01-01","2025-02-12","false","10000.00","11860.00","true"

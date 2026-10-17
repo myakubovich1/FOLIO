@@ -1,0 +1,6 @@
+# Foundation checkpoint
+Scope: Next.js App Router migration preserving the borrower demo; official Auth0 authorization-code session integration; private owner/demo isolation and storage; Tiger Data schema, transaction hypertable and continuous aggregate with explicit local SQLite adapter. Initial validated CSV parser/preview and PDF owner/recipient endpoints are present; their UI and complete provenance handling are the next checkpoint.
+
+Verified locally: production build/typecheck/lint; 14 financial/API/import/owner/Timescale tests with no skipped database test when FOLIO_TEST_DATABASE_URL points at the local container. Tests cover continuous aggregate correction refresh and deletion, owner filtering, authenticated-identity injection, source idempotency, decimal parsing and PDF download authorization/revocation. Auth0 identity tests use an injected trusted verifier in the factory, never an environment/header bypass in the production entry point. Actual Auth0 tenant callback and Tiger Cloud remain externally unconfigured.
+
+Browser checks use the production-mode server on port 3101 to avoid concurrent hot reloads changing bundles; the normal development server uses port 3100. Another unrelated app uses port 3000 and has been preserved. No production readiness claim is made from a local build.
