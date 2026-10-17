@@ -8,6 +8,7 @@ import "@fontsource/inter-tight/700.css";
 import "@fontsource/inter-tight/800.css";
 import "@fontsource/inter-tight/900.css";
 import "../src/style.css";
+import "../src/graphics.css";
 export const metadata: Metadata = {
   title: "Folio · Credit beyond your credit history",
   description:

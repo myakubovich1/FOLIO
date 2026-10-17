@@ -26,6 +26,7 @@ prompt="$snapshot/review-prompt.txt"
 } > "$prompt"
 out="$PWD/reviews/$commit.json"
 claude_args=(-p --effort "${FOLIO_REVIEW_EFFORT:-low}" --permission-mode dontAsk --tools Read,Glob,Grep --allowedTools Read,Glob,Grep --disallowedTools Bash,Edit,Write,Agent,Task,NotebookEdit --disable-slash-commands --setting-sources '' --strict-mcp-config --mcp-config "$snapshot/empty-mcp.json" --settings '{"disableAllHooks":true}' --output-format json)
+if [[ -n "${FOLIO_REVIEW_MODEL:-}" ]]; then claude_args+=(--model "$FOLIO_REVIEW_MODEL"); fi
 session_cwd="$snapshot"
 if [[ -n "${2:-}" ]]; then
   if [[ ! "$2" =~ ^[a-f0-9-]{36}$ ]] || [[ ! -f "$root/.workflow/sessions/$2.cwd" ]]; then echo 'No saved reviewer directory for that session. Run a fresh review without the session ID.' >&2; exit 1; fi
@@ -37,7 +38,7 @@ fi
 # This installed Claude version scopes resume lookup to its original working directory.
 cd "$session_cwd"
 # Available tools, not just preapproved tools, are restricted. No Bash/Edit/Write/Agent/MCP.
-claude "${claude_args[@]}" < "$prompt" > "$out"
+"${FOLIO_CLAUDE_CLI:-claude}" "${claude_args[@]}" < "$prompt" > "$out"
 node --input-type=module - "$out" "$root" "$session_cwd" <<'JS'
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
 const result=JSON.parse(readFileSync(process.argv[2],'utf8'));

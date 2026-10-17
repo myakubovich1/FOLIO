@@ -975,39 +975,6 @@ body > .error {
 .loading .logo {
   margin-bottom: 24px;
 }
-.chart {
-  display: flex;
-  gap: 10px;
-  height: 190px;
-  overflow-x: auto;
-  align-items: end;
-  padding: 16px 0 4px;
-  border-bottom: 1px solid var(--border);
-}
-.month {
-  flex: 1;
-  min-width: 32px;
-}
-.bars {
-  height: 135px;
-  display: flex;
-  align-items: end;
-  gap: 3px;
-}
-.bars i {
-  width: 50%;
-  background: var(--green);
-  border-radius: 4px 4px 0 0;
-}
-.bars i + i {
-  background: var(--forest);
-}
-.month small {
-  text-align: center;
-  font-size: 9px;
-  margin-top: 10px;
-  white-space: nowrap;
-}
 .legend-dot {
   display: inline-block;
   width: 8px;
@@ -2230,8 +2197,4 @@ td select {
 }
 .privacy-section :focus-visible {
   outline-color: var(--green);
-}
-.bars i {
-  border: 1px solid var(--forest);
-  border-bottom: 0;
 }

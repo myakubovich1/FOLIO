@@ -40,6 +40,41 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
   ).toBeFocused();
   await expect(page.locator(".score")).toContainText("70");
   await expect(page.getByText("$50,400", { exact: true })).toBeVisible();
+  // The chart inspector must reconcile with the same corrected assessment.
+  const assessed = (await (await context.request.get("/api/state")).json())
+    .assessment;
+  const first = assessed.monthly[0],
+    second = assessed.monthly[1];
+  const monthName = (month: string) =>
+    new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${month}-01T00:00:00Z`));
+  const exactMoney = (amount: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: assessed.currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount / 100);
+  const firstMonth = page.getByRole("button", {
+    name: `View ${monthName(first.month)} cash flow`,
+  });
+  await firstMonth.click();
+  const inspector = page.locator(".month-inspector");
+  await expect(inspector).toContainText(exactMoney(first.income));
+  await expect(inspector).toContainText(exactMoney(first.spending));
+  await expect(inspector).toContainText(exactMoney(first.refunds));
+  await page.keyboard.press("ArrowRight");
+  const nextMonth = page.getByRole("button", {
+    name: `View ${monthName(second.month)} cash flow`,
+  });
+  await expect(nextMonth).toBeFocused();
+  await expect(nextMonth).toHaveAttribute("aria-pressed", "true");
+  await expect(inspector).toContainText(monthName(second.month));
+  await expect(inspector).toContainText(exactMoney(second.income));
+
   await page.screenshot({
     path: `test-results/${info.project.name}-assessment.png`,
     fullPage: true,

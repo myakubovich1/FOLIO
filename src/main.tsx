@@ -3,6 +3,12 @@ import type { State, Assessment, Passport } from "./contracts";
 import { api, money, displayDate } from "./api";
 import { Logo } from "./components/Logo";
 import { Icon } from "./components/Icon";
+import {
+  IndexVisual,
+  JourneyArt,
+  FactorGlyph,
+} from "./components/Infographics";
+import { CashflowPlot } from "./components/CashflowPlot";
 import { Report } from "./components/Report";
 import { Sources } from "./components/Sources";
 import { Records } from "./components/Records";
@@ -145,7 +151,6 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
       });
     return () => controller.abort();
   }, [assessment.revision, assessment.model]);
-  const scale = Math.max(...rows.flatMap((m) => [m.income, m.spending]), 1);
   return (
     <section className="card">
       <div className="split">
@@ -157,33 +162,11 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
         borrowing are excluded from income.
       </p>
       {error && <p className="caution">{error}</p>}
-      <div
-        className="chart"
-        role="region"
-        tabIndex={0}
-        aria-label="Monthly external income and spending"
-      >
-        {rows.map((m) => (
-          <div className="month" key={m.month}>
-            <div className="bars" aria-hidden="true">
-              <i
-                title={`Income ${money(m.income, assessment.currency)}`}
-                style={{ height: `${(m.income / scale) * 100}%` }}
-              />
-              <i
-                title={`Spending ${money(m.spending, assessment.currency)}`}
-                style={{ height: `${(m.spending / scale) * 100}%` }}
-              />
-            </div>
-            <small>{m.month.slice(2)}</small>
-          </div>
-        ))}
-      </div>
-      <p className="fine">
-        <span className="legend-dot" />
-        External income · <span className="legend-dot forest" />
-        Spending before refunds · zero baseline.
-      </p>
+      <CashflowPlot
+        rows={rows}
+        currency={assessment.currency}
+        incomplete={assessment.score === null}
+      />
       <details>
         <summary>View exact monthly figures</summary>
         <div className="table-wrap">
@@ -326,12 +309,16 @@ function Landing({
                 <div className="eyebrow">
                   FOLIO CREDIT INDEX · SYNTHETIC DATA
                 </div>
-                <div className="score">
-                  {preview.score ?? "—"}
-                  <small>
-                    {preview.score === null ? "More evidence needed" : "/ 100"}
-                  </small>
-                </div>
+                <IndexVisual score={preview.score}>
+                  <div className="score">
+                    {preview.score ?? "—"}
+                    <small>
+                      {preview.score === null
+                        ? "More evidence needed"
+                        : "/ 100"}
+                    </small>
+                  </div>
+                </IndexVisual>
                 <h2>
                   {preview.score === null
                     ? "A useful next step, not a zero."
@@ -389,22 +376,31 @@ function Landing({
           {[
             [
               "01",
+              "records",
               "Bring your records",
               "Use permissioned statements or a clearly labeled simulation. See source scope before processing.",
             ],
             [
               "02",
+              "review",
               "Review what they mean",
               "Check income, transfers and expenses. Correct an interpretation without rewriting the source.",
             ],
             [
               "03",
+              "passport",
               "Understand and share",
               "Inspect the calculation, then issue a limited passport with an expiring, revocable link.",
             ],
-          ].map(([n, title, copy]) => (
-            <article key={n}>
-              <span>{n}</span>
+          ].map(([n, kind, title, copy]) => (
+            <article
+              className={`illustrated-step illustrated-step-${kind}`}
+              key={n}
+            >
+              <div className="journey-art">
+                <JourneyArt kind={kind as "records" | "review" | "passport"} />
+                <span className="art-step-number">{n}</span>
+              </div>
               <h3>{title}</h3>
               <p>{copy}</p>
             </article>
@@ -1181,10 +1177,14 @@ function AssessmentView({
             <div className="eyebrow">FOLIO CREDIT INDEX</div>
             <Icon name="trend" />
           </div>
-          <div className="score">
-            {a.score ?? "—"}
-            <small>{a.score === null ? "More evidence needed" : "/ 100"}</small>
-          </div>
+          <IndexVisual score={a.score}>
+            <div className="score">
+              {a.score ?? "—"}
+              <small>
+                {a.score === null ? "More evidence needed" : "/ 100"}
+              </small>
+            </div>
+          </IndexVisual>
           <h2>
             {a.score === null
               ? "More evidence needed"
@@ -1278,17 +1278,27 @@ function AssessmentView({
       <section className="card">
         <h2>What drives your result</h2>
         {a.factors.length ? (
-          a.factors.map((f) => (
+          a.factors.map((f, index) => (
             <button
-              className="factor"
+              className="factor visual-factor"
               key={f.name}
               onClick={() => onEvidence(f.evidence)}
             >
-              <span>
-                {f.name}
+              <span className="factor-symbol">
+                <FactorGlyph index={index} />
+              </span>
+              <span className="factor-copy">
+                <span className="factor-name">{f.name}</span>
                 <small>
                   Inspect the contribution and supporting evidence →
                 </small>
+                <span className="factor-meter" aria-hidden="true">
+                  <i
+                    style={{
+                      width: `${Math.min(100, Math.max(0, (f.points / f.maximum) * 100))}%`,
+                    }}
+                  />
+                </span>
               </span>
               <strong>
                 {f.points.toFixed(2)} / {f.maximum}

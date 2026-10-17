@@ -1,25 +1,31 @@
 import type { Passport } from "../contracts";
 import { money, displayDate } from "../api";
+import { IndexVisual, PassportEmblem } from "./Infographics";
 export function Report({ passport: p }: { passport: Passport }) {
   const a = p.assessment;
   return (
     <article className="report">
-      <div className="eyebrow">
-        FINANCIAL PASSPORT ·{" "}
-        {a.sourceKind === "synthetic"
-          ? "SYNTHETIC DEMO"
-          : a.sourceKind === "sandbox"
-            ? "BANKING SIMULATION"
-            : "PERMISSIONED RECORDS"}
+      <div className="report-masthead">
+        <div className="eyebrow">
+          FINANCIAL PASSPORT ·{" "}
+          {a.sourceKind === "synthetic"
+            ? "SYNTHETIC DEMO"
+            : a.sourceKind === "sandbox"
+              ? "BANKING SIMULATION"
+              : "PERMISSIONED RECORDS"}
+        </div>
+        <PassportEmblem />
       </div>
       <h2>
         Your activity.
         <br />A clearer financial picture.
       </h2>
-      <div className="score">
-        {a.score ?? "—"}
-        <small>{a.score === null ? "More evidence needed" : "/ 100"}</small>
-      </div>
+      <IndexVisual score={a.score}>
+        <div className="score">
+          {a.score ?? "—"}
+          <small>{a.score === null ? "More evidence needed" : "/ 100"}</small>
+        </div>
+      </IndexVisual>
       <h3>Folio Credit Index</h3>
       <p className="fine">{a.validation}</p>
       <section className="report-context">
@@ -58,7 +64,16 @@ export function Report({ passport: p }: { passport: Passport }) {
           <h3>What contributes to the index</h3>
           {a.factors.map((f) => (
             <div className="factor report-factor" key={f.name}>
-              <span>{f.name}</span>
+              <span className="factor-copy">
+                {f.name}
+                <span className="factor-meter" aria-hidden="true">
+                  <i
+                    style={{
+                      width: `${Math.min(100, Math.max(0, (f.points / f.maximum) * 100))}%`,
+                    }}
+                  />
+                </span>
+              </span>
               <strong>
                 {f.points.toFixed(2)} / {f.maximum}
               </strong>
