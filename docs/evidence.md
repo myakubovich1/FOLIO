@@ -1,6 +1,6 @@
 # Verified delivery evidence
 
-Latest UI source reviewed at **dea85f91cae053a1c9d49f3d4d5d4abbb679e794**; the final follow-up confirms the icon, error-indicator and focus-clearance repairs with no new findings. The final UI suite passes14/14 and both axe reports contain zero violations. See [UI checkpoint](checkpoint-ui.md) and `output/verification/ui-manifest.json`.
+Latest application graphics source is **5c10407c90e91102c4938d0d540f58186ea1e3fd**, with the strengthened test checkpoint **cde6da887fe82a82d9e07d040c33d70d4b1b51c6** independently reviewed by **Claude Opus 5.5**. Full browser suite16/16; four affected cases reran successfully with native swipe and explicit zero-month assertions; both axe reports contain zero violations. See [graphics checkpoint](checkpoint-graphics.md) and `output/verification/graphics-manifest.json`. Earlier [UI checkpoint](checkpoint-ui.md) and manifests remain historical.
 
 The provider/architecture baseline below was reviewed at **8cc031f85ea5fbda5abc86dacf376cb7d32b4db1**. Provider/migration/access findings and repairs are in reviews/PRODUCT-CYCLE.md and per-commit reports. Live-provider evidence was not regenerated for the UI refinement.
 

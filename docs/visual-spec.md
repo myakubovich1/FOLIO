@@ -17,3 +17,11 @@ Visual checks: browser screenshots at 1440, 768, 390, 320 CSS pixels; 720 CSS-pi
 The working synthetic demo is the primary landing action when private sign-in is unavailable. The preview uses a white financial card on a bright green stage, with clearer typography and shorter introductory copy. The dashboard pairs a forest index card with a neutral evidence panel; dates, history and source are grouped separately from the score. Connected overviews omit repeated setup steps. Original inline SVG icons replace platform-dependent glyphs.
 
 Navigation moves keyboard focus to the new page heading and resets scroll instantly; surface entry uses a 220ms, 6px movement without fading text, and controls use 180ms feedback. All motion is disabled for reduced-motion preferences. The scored card has a contrasting lime keyboard focus ring. Loading indicators announce pending work without animating financial values.
+
+## Financial graphics
+
+Original SVG illustrations explain records → interpretation → passport, using pale green, warm neutral and blue surfaces. They are decorative, contain no invented metrics and are excluded from the accessibility tree. The passport globe is an editorial emblem, not a verification badge.
+
+The index ring repeats the actual integer on a 0–100 scale; a dashed, unfilled track distinguishes an unscored result. Flat arc ends preserve exact proportions. Factor bars show contributions relative to each labelled maximum, not equally weighted shares. No confidence percentage or approval likelihood is drawn.
+
+The monthly chart uses a common zero baseline and gross spending; refunds stay separate. A focusable, horizontally scrollable toolbar supports click/touch, arrows and Home/End. Each month has an exact-value screen-reader description, and the inspector is not a second live announcement. The exact monthly table remains available. Query results must match the current assessment month by month before replacing its summary; stale/empty mismatches offer assessment refresh, while network failure offers analytics retry. Motion preferences remain respected.

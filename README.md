@@ -2,6 +2,10 @@
 
 **Credit beyond your credit history.** Permissioned financial records → review and correction → deterministic alternative assessment → portable financial passport → expiring sharing and revocation. An existing credit score is not required. This experimental scorecard is not a lending decision, repayment prediction, or promise of lender acceptance.
 
+## Visual experience
+
+Original SVG journey illustrations, an assessment index ring, labelled factor bars, and a keyboard/touch cash-flow inspector make the borrower story visible. Graphics use the existing deterministic metrics, separate missing evidence from zero, and preserve passport disclosure choices. See the [graphics checkpoint](docs/checkpoint-graphics.md) for screenshots and independent Opus 5.5 review evidence.
+
 ## Core sponsor integrations
 
 - **Capital One Nessie:** actual API reads from a dedicated synthetic customer, supported resource/capability checks, exact-money normalization, source references and persistent assessments/passports. The configured demo has three deposits and three withdrawals. Missing history and unclassified cash movements cause an honest unscored result.
@@ -59,6 +63,15 @@ Codex is the sole builder/coordinator; Claude Code is the sole independent revie
 # Resume Codex here, or after stopping this chat's builder:
 npm run builder
 # Review the exact committed snapshot:
+env -u ANTHROPIC_API_KEY npm run review -- HEAD
+```
+
+For the requested Opus 5.5 reviews, an isolated CLI2.1.302 is installed under ignored `.workflow/claude-cli`; the global CLI is unchanged. To reproduce that optional setup:
+
+```sh
+npm install --prefix .workflow/claude-cli --no-audit --no-fund @anthropic-ai/claude-code@2.1.302
+FOLIO_CLAUDE_CLI="$PWD/.workflow/claude-cli/node_modules/.bin/claude" \
+FOLIO_REVIEW_MODEL=claude-opus-5-5 \
 env -u ANTHROPIC_API_KEY npm run review -- HEAD
 ```
 
