@@ -126,3 +126,39 @@ test("monthly chart aggregates multiple receipts and reconciles to period totals
     a.expenses,
   );
 });
+
+test("complete synthetic checking ledgers reconcile documented month-end balances", () => {
+  for (const p of profiles.filter((p) => p.id !== "limited")) {
+    const b = seed(p.id);
+    let balance = b.openingBalance!;
+    const ends = [];
+    for (const month of [
+      ...new Set(b.records.map((r) => r.date.slice(0, 7))),
+    ].sort()) {
+      balance += b.records
+        .filter((r) => r.date.startsWith(month))
+        .reduce((n, r) => n + r.amount, 0);
+      ends.push(balance);
+    }
+    assert.equal(balance, b.closingBalance);
+    assert.equal(Math.min(...ends), b.minimumBalance);
+  }
+});
+
+test("pending-only months do not create phantom chart observations", () => {
+  const b = seed("newcomer");
+  b.records.push({
+    id: "pending-next",
+    date: "2026-01-01",
+    amount: 100,
+    currency: "USD",
+    description: "Pending",
+    category: "income",
+    originalCategory: "income",
+    status: "pending",
+  });
+  assert.equal(
+    assess(b).monthly.some((m) => m.month === "2026-01"),
+    false,
+  );
+});

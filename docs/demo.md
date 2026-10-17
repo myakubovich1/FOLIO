@@ -4,19 +4,27 @@ Rehearsal: start Docker database and Folio, open a fresh browser context at loca
 
 ## Three-minute live script
 
-- 0:00–0:20 Entry: “Alex has no usable traditional credit file. Folio turns permissioned financial evidence into an explainable experimental alternative assessment.” Select the obvious saved synthetic demo and consent. Explain that no bank credentials are requested.
-- 0:20–0:55 Records: search Returned deposit. It was initially income; inspect the source, then select transfer. This meaningful correction excludes $100 from external income, changes $50,500 to $50,400, recalculates 71 to 70 and preserves the original category.
-- 0:55–1:25 Assessment: show separate evidence confidence and exact factor contributions. Open a factor's source references. Explain that residual cash flow is income minus expenses, not an approved loan amount. Ask the evidence assistant; label calculated explanation if Gemini is not configured. Briefly calculate a conditional expense scenario; no issued result is rewritten.
-- 1:25–1:55 Passport: choose disclosure, inspect the recipient preview, issue the revision and download the two-page PDF. Create a seven-day link; open the recipient page in the prepared separate browser. Show model, coverage, source and limitations retained without raw account/merchant histories.
-- 1:55–2:25 Emerging market: choose Amani, Kenya/KES seasonal farmer. Saved synthetic records span 2024–2025. Show 85 with two-year coverage, not an occupation bonus or a comparison to USD. Explain that low-income months alone are not a penalty; unknown evidence causes abstention.
-- 2:25–2:50 Controls: in the Alex owner/demo tab, Settings → Revoke link. Refresh recipient and test PDF route; future access fails. Downloaded copies cannot be recalled.
-- 2:50–3:00 Close: “This is an experimental scorecard, not a lending decision. Today we verified [actual provider-status result]. Real Auth0/Nessie/Gemini calls require the configuration listed in our report.”
+Prepare two isolated US tabs: Alex's saved synthetic profile and a fresh dedicated Nessie simulation. Keep a recipient tab ready. Check providers:smoke first. If live credentials are absent, label those acceptance steps blocked and show the working fixture journey; never narrate a fake request as live.
 
-Follow-up: demonstrate limited-evidence profile (calm abstention), synthetic example upload with preview refresh, missing-provider recovery, source disconnect retention, deletion and cross-owner test evidence. If live integrations are configured, replace only the corresponding step with a verified request and show its status; never claim unavailable feeds are complete.
+- 0:00–0:20: Alex has no usable traditional credit file. Consent to saved synthetic records and show the explainable71. No fabricated bureau lookup/rejection or loan promise.
+- 0:20–0:45: In the Nessie tab, consent and **make the actual API request**. Show successful read time, feed capabilities, normalized record source and current assessment. Confirm a deposit's actual synthetic purpose. Incomplete API statement history correctly yields an unscored report with useful metrics and missing evidence. Show that sandbox provenance follows the issued passport.
+- 0:45–1:00: Return to Alex. Correct the returned $100 deposit from income to own transfer. Income changes $50,500→$50,400 and index71→70. Source category is retained.
+- 1:00–1:35: Enable Gemini with permission. **Make an actual server-side request**: how was this result calculated, what is missing and what could improve this model result? Open supporting references and exact factor contributions. Explain that Gemini selects/extracts/interprets evidence; deterministic code owns the numbers and every financial claim is verified. State real model/prompt version from the result.
+- 1:35–2:00: Preview disclosure, issue the immutable revision, export the matching PDF, create a seven-day link and open the recipient view without raw identity/merchant histories.
+- 2:00–2:15: Briefly switch to Kenya's seasonal farmer85, two years of KES synthetic evidence. No occupation bonus or USD/KES ranking; no live Kenya-bank claim.
+- 2:15–2:35: Revoke Alex's link, wait for the success state and refresh the recipient/PDF. Future access fails; downloaded copies cannot be recalled.
+- 2:35–3:00: Show the small evaluation report: unsupported citation rejection, current-number consistency and missing-data handling. Identify live versus offline results and external blockers. Close on the coherent, controlled borrower journey and experimental model limitations.
+
+## Live sponsor preparation
+
+1. Enter NESSIE_API_KEY, NESSIE_CUSTOMER_ID (or setup command), GEMINI_API_KEY and accessible GEMINI_MODEL locally. Auth0 configuration is needed for private uploads; the explicitly enabled dedicated public synthetic sandbox can demonstrate Nessie independently.
+2. `npm run providers:check`, `npm run providers:smoke`, `npm run eval:ai`. Inspect failures rather than replacing them with saved data. Run actual category/pattern suggestions on synthetic rows, and human-compare the PDF extraction output.
+3. Restart Folio, begin a new USD demo, choose Nessie simulation before connecting saved fixtures, and consent. Keep sandbox, uploaded and saved evidence labels distinct; mixed source types are rejected.
+4. Snapshot/export the current sandbox assessment, even if unscored. Judges must see the direct API → normalized evidence → metrics/limits → passport chain. A controlled synthetic seed is not complete historical bank coverage.
 
 ## Two-minute video script
 
-0:00–0:15: US borrower without traditional score and the product's purpose. 0:15–0:40: permission, record review, $100 correction and recalculated result. 0:40–1:00: factor evidence and separate confidence. 1:00–1:20: passport preview, PDF and controlled recipient link. 1:20–1:40: Kenya seasonal profile, two years, different KES evidence. 1:40–1:55: revoke and show blocked recipient. 1:55–2:00: experimental limitations and truthful integration status. Record actual interactions; label cuts. Include Codex/Claude assistance and library credits in the project description.
+0:00–0:15: US borrower without traditional score and the product's purpose. 0:15–0:40: permission, record review, $100 correction and recalculated result. 0:40–1:00: actual Nessie read, source-to-insight trace and honest missing coverage. 1:00–1:20: actual grounded Gemini answer with verified figures, then passport/PDF/link. 1:20–1:40: Kenya seasonal profile, two years, different KES evidence. 1:40–1:55: revoke and show blocked recipient. 1:55–2:00: experimental limitations and truthful integration status. Record actual interactions; label cuts. Include Codex/Claude assistance and library credits in the project description.
 
 ## Event checks (verified 2026-10-17)
 

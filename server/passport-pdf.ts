@@ -156,6 +156,10 @@ export function passportPdf(p: Passport): Promise<Buffer> {
     paragraph(
       `Model ${a.model}. Capacity contributes up to 50 points: 50 x clamp((income - expenses) / income / 0.4). Liquidity contributes up to 30 points: 30 x clamp(closing liquid balance / average monthly expenses / 3). Cycle resilience contributes up to 20 points: 20 x clamp(minimum month-end balance / average monthly expenses). Clamp each ratio to 0-1, sum the contributions, then round once to the nearest integer. Developer-chosen weights are hypotheses, not coefficients learned from repayment outcomes.`,
     );
+    if (p.disclosure?.cashflow === false)
+      paragraph(
+        "Cash-flow inputs were withheld by the issuer. This recipient cannot independently reproduce the factor values from the report alone.",
+      );
     paragraph(
       "Ordinary profiles require at least 90 days and three complete months. Seasonal profiles require two complete years. Missing required coverage, classifications, obligations or balance evidence produces an unscored result, not a zero. Calculation uses exact minor units for observed amounts and one currency at a time. Transfers and borrowing are excluded from income; refunds offset expenses.",
     );
@@ -165,6 +169,10 @@ export function passportPdf(p: Passport): Promise<Buffer> {
       "This immutable passport represents the selected input revision, not a live account. Optional cash-flow figures and factor details may be withheld; model, coverage, evidence confidence and limitations always remain. Sharing can expire or be revoked through Folio. Revocation stops future service access and cannot recall a downloaded copy.",
     );
     heading("Source and model record");
+    if (p.apiProvenance)
+      paragraph(
+        `Nessie live API read: ${p.apiProvenance.readAt}. ${p.apiProvenance.records} normalized records across ${p.apiProvenance.accounts} accounts. ${p.apiProvenance.note}`,
+      );
     paragraph(
       `Snapshot ${p.id}\nSource: ${p.source}\nGenerated: ${p.generatedAt}\nFinancial identity and raw merchant histories are excluded from this report.`,
     );

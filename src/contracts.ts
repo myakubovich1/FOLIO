@@ -35,6 +35,7 @@ export interface Borrower {
   end: string;
   months: number;
   complete: boolean;
+  openingBalance?: number;
   closingBalance: number | null;
   minimumBalance: number | null;
   obligationsDocumented: boolean;
@@ -82,6 +83,13 @@ export interface Assessment {
 export interface Passport {
   id: string;
   generatedAt: string;
+  apiProvenance?: {
+    provider: "nessie";
+    readAt: string;
+    records: number;
+    accounts: number;
+    note: string;
+  };
   source: string;
   assessment: Omit<
     Assessment,
@@ -121,6 +129,14 @@ export interface State {
     at: string;
   }[];
   explanation?: Explanation;
+  providerSync?: {
+    nessie?: {
+      at: string;
+      accounts: number;
+      records: number;
+      capabilities: Record<string, string>;
+    };
+  };
   patternSuggestion?: {
     pattern: NonNullable<Borrower["incomePattern"]>;
     evidence: string[];

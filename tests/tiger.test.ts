@@ -45,6 +45,25 @@ test(
         ),
         5040000,
       );
+      const budget = await Promise.all(
+        Array.from({ length: 6 }, () =>
+          store.takeProviderBudget(owner, "test-ai", 4),
+        ),
+      );
+      assert.equal(budget.filter(Boolean).length, 4);
+      const replica = new Store(
+        ":memory:",
+        process.env.FOLIO_TEST_DATABASE_URL,
+      );
+      await replica.init();
+      try {
+        assert.equal(
+          await replica.takeProviderBudget(owner, "test-ai", 4),
+          false,
+        );
+      } finally {
+        await replica.close();
+      }
       await store.delete(owner);
       assert.equal((await store.cashflow(owner)).rows.length, 0);
       assert.ok(await store.get(other));

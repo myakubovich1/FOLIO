@@ -20,3 +20,5 @@ sum(CASE WHEN category='expense' AND amount<0 AND status='posted' THEN -amount E
 sum(CASE WHEN category='refund' AND amount>0 AND status='posted' THEN amount ELSE 0 END) AS refunds
 FROM folio_transactions GROUP BY owner,currency,bucket WITH NO DATA;
 ALTER MATERIALIZED VIEW folio_daily_cashflow SET (timescaledb.materialized_only=false);
+
+CREATE TABLE IF NOT EXISTS folio_provider_limits(owner TEXT NOT NULL REFERENCES folio_owners(id) ON DELETE CASCADE,scope TEXT NOT NULL,window_start BIGINT NOT NULL,count INTEGER NOT NULL,PRIMARY KEY(owner,scope));

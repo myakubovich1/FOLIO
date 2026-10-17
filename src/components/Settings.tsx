@@ -4,6 +4,7 @@ import { api, displayDate } from "../api";
 export interface Health {
   ok: boolean;
   storage: string;
+  publicSandbox?: boolean;
   providers: {
     auth0: boolean;
     tiger: boolean;

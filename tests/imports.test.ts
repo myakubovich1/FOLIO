@@ -40,7 +40,7 @@ test("CSV invalid dates, mixed currency and failed reconciliation stay visible",
   const mixed = previewCsv(sample.replace('"USD"', '"EUR"'), "mixed.csv");
   assert.ok(mixed.errors.length);
   const balance = previewCsv(
-    sample.replaceAll('"10000.00"', '"10000.01"'),
+    sample.replaceAll('"2200.00"', '"2200.01"'),
     "unbalanced.csv",
   );
   assert.equal(balance.reconciled, false);

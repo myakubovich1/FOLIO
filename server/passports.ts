@@ -10,6 +10,17 @@ export function snapshot(
   return {
     id: randomUUID(),
     generatedAt: new Date().toISOString(),
+    ...(s.providerSync?.nessie
+      ? {
+          apiProvenance: {
+            provider: "nessie" as const,
+            readAt: s.providerSync.nessie.at,
+            records: s.providerSync.nessie.records,
+            accounts: s.providerSync.nessie.accounts,
+            note: "Actual API read of synthetic banking data; complete statement coverage and historical balances are not established by this read.",
+          },
+        }
+      : {}),
     source:
       s.sources
         ?.map((x) => `${x.label}${x.connected ? "" : " (disconnected)"}`)

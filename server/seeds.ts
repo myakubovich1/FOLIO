@@ -122,6 +122,42 @@ export function seed(id: string): Borrower {
     originalCategory: "income",
     description: "Returned deposit · review suggested classification",
   });
+  // Explicit synthetic asset reallocations reconcile the checking statement
+  // with its documented month-end balance evidence; they are never income.
+  if (p.id !== "limited") {
+    let balance: number = p.min;
+    for (let m = 0; m < p.months; m++) {
+      const month = new Date(Date.UTC(startYear, m, 1))
+        .toISOString()
+        .slice(0, 7);
+      balance += records
+        .filter((r) => r.date.startsWith(month))
+        .reduce((n, r) => n + r.amount, 0);
+      const target = m === p.months - 1 ? p.balance : p.min;
+      const adjustment = target - balance;
+      if (adjustment)
+        records.splice(records.length - 1, 0, {
+          id: `${p.id}-${m}-asset-reallocation`,
+          date: `${month}-28`,
+          amount: adjustment,
+          currency: p.currency,
+          category: "transfer",
+          originalCategory: "transfer",
+          description:
+            adjustment < 0
+              ? "Transfer to own non-liquid assets · synthetic"
+              : "Transfer from own non-liquid assets · synthetic",
+        });
+      balance = target;
+    }
+  }
+  for (const record of records) {
+    record.sourceId = "saved-demo";
+    record.accountId = `synthetic-${p.id}`;
+    record.status = "posted";
+    record.interpretation = "source-recorded";
+    record.sourceLocation = "Saved synthetic checking statement";
+  }
   return {
     id: p.id,
     name: p.name,
@@ -132,6 +168,7 @@ export function seed(id: string): Borrower {
     end: p.id === "limited" ? "2025-02-12" : "2026-01-01",
     months: p.months,
     complete: p.id !== "limited",
+    openingBalance: p.id !== "limited" ? p.min : undefined,
     closingBalance: p.balance,
     minimumBalance: p.min,
     obligationsDocumented: true,

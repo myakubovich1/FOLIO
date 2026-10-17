@@ -94,6 +94,7 @@ if (process.env.GEMINI_API_KEY) {
         : false,
       availableModels: names,
       extractionAndExplanationVerified: false,
+      note: "Model discovery alone is not generation. providers:smoke verifies actual explanation and PDF calls.",
     };
   } catch {
     results.gemini = {

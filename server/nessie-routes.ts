@@ -11,7 +11,7 @@ export function registerNessie(app: Express, store: Store) {
   app.post("/api/nessie/sync", async (req, res) => {
     z.object({ consent: z.literal(true) }).parse(req.body);
     const state: State = res.locals.state;
-    if (state.mode !== "owner") {
+    if (state.mode !== "owner" && process.env.FOLIO_PUBLIC_SANDBOX !== "true") {
       res.status(403).json({
         error:
           "Sign in to connect the dedicated Nessie banking simulation. Public demos use saved synthetic records.",
@@ -33,6 +33,13 @@ export function registerNessie(app: Express, store: Store) {
       });
       return;
     }
+    if (!(await store.takeProviderBudget(res.locals.owner, "nessie", 4))) {
+      res.status(429).json({
+        error:
+          "Wait one minute before another Nessie synchronization. Your saved records remain available.",
+      });
+      return;
+    }
     try {
       const result = await new NessieClient().ingest();
       if (!result.previews.some((p) => p.rows.length))
@@ -43,6 +50,14 @@ export function registerNessie(app: Express, store: Store) {
         for (const preview of result.previews)
           if (preview.rows.length) applyImport(s, preview);
         s.assessment = assess(s.borrower, s.revision);
+        s.providerSync = {
+          nessie: {
+            at: new Date().toISOString(),
+            accounts: result.previews.length,
+            records: result.previews.reduce((n, p) => n + p.rows.length, 0),
+            capabilities: result.capabilities,
+          },
+        };
       });
       res.json({ state: saved.state, capabilities: result.capabilities });
     } catch (e) {

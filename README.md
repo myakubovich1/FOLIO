@@ -1,6 +1,18 @@
 # Folio
 Credit beyond your credit history. An experimental, explainable alternative assessment from permissioned financial activity, with a portable financial passport. No existing credit score required; no lender acceptance or predictive repayment validity is claimed.
 
+## Nessie + Gemini are core product capabilities
+
+Nessie performs **actual server-side API reads** of a dedicated synthetic banking customer, normalizes supported resources, persists source references and uses those records in the assessment and passport. Gemini performs **actual server-side generation** for supported explanation claims/citations, PDF extraction and suggested interpretation; financial math stays deterministic. No saved fixture is substituted for a failed live-provider check.
+
+Live execution currently needs keys/customer/model entered in the ignored local `.env.local` (never chat). Run `npm run providers:check` for configuration/discovery, then `npm run providers:smoke` for actual Nessie → normalized records → assessment → persistence/passport and actual Gemini explanation/PDF requests. `npm run eval:ai` records numerical/evidence and configured live classification/explanation checks separately. A model listing or adapter implementation is not a completed live integration.
+
+With only a Nessie key, `npm run nessie:setup` shows a plan; `npm run nessie:setup -- --apply` creates/finds a dedicated synthetic customer and saves its ID locally. Run `nessie:seed` to inspect the seed plan, then explicit `--apply` if desired. The optional `FOLIO_PUBLIC_SANDBOX=true` permits isolated public demo sessions to read that shared **synthetic-only** customer without requiring Auth0; private uploads/owner data remain authenticated. It defaults off, and is explicitly on in this local judge-demo workspace.
+
+See the [category checklist](docs/category-checklist.md), [provider/action evidence](docs/sponsor-map.md), [live walkthrough](docs/demo.md), [Devpost draft](docs/devpost-draft.md) and [secret-entry instructions](docs/configuration.md). Target: Nessie, Gemini, AI/ML, UI/UX and Overall, subject to actual eligibility and category rules. Successful external-provider calls remain blocked until configuration is supplied; local Timescale and the service-free synthetic journey are independently testable.
+
+Active local workspace after iCloud recovery: `/Users/myakubovich/Projects/FOLIO`. The original Documents repository is preserved; see [recovery provenance](docs/recovery.md).
+
 ## Local setup
 Node 22.17+ is required. The application uses Next.js App Router with a co-hosted Express API. Tiger Data/Postgres is the connected source of truth; an explicit SQLite adapter supports service-free synthetic demos. A configured database failure never silently switches storage.
 

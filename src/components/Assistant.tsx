@@ -51,6 +51,7 @@ export function Assistant({
           "Which transfers were excluded?",
           "Why does my income look seasonal?",
           "Which missing records prevent an assessment?",
+          "What could improve this model result?",
         ].map((q) => (
           <button disabled={busy} key={q} onClick={() => ask(q)}>
             {q}

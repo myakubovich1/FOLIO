@@ -65,6 +65,17 @@ export function Report({ passport: p }: { passport: Passport }) {
         </p>
       ))}
       <p className="fine">{p.source}</p>
+      {p.apiProvenance && (
+        <section className="report-context">
+          <strong>Nessie API evidence</strong>
+          <p>
+            {p.apiProvenance.records} normalized records across{" "}
+            {p.apiProvenance.accounts} accounts. Read{" "}
+            {displayDate(p.apiProvenance.readAt)}.
+          </p>
+          <small>{p.apiProvenance.note}</small>
+        </section>
+      )}
       <p className="fine">
         Model {a.model} · input revision {a.revision} · generated{" "}
         {displayDate(p.generatedAt)}.

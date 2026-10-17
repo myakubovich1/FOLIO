@@ -44,6 +44,13 @@ export function registerUploads(app: Express, store: Store) {
         });
         return;
       }
+      if (!(await store.takeProviderBudget(res.locals.owner, "gemini"))) {
+        res.status(429).json({
+          error:
+            "Please wait one minute before another AI request, or use CSV/manual review.",
+        });
+        return;
+      }
       try {
         preview = await extractStatement(file.buffer, file.originalname);
       } catch (e) {

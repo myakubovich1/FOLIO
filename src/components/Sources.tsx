@@ -5,8 +5,10 @@ export function Sources({
   state,
   onState,
   onSaved,
+  publicSandbox = false,
 }: {
   state: State;
+  publicSandbox?: boolean;
   onState: (s: State) => void;
   onSaved: () => Promise<void>;
 }) {
@@ -66,20 +68,32 @@ export function Sources({
         {demo && (
           <button
             aria-pressed={tab === "saved"}
-            onClick={() => setTab("saved")}
+            onClick={() => {
+              setTab("saved");
+              setConsent(false);
+              setAiConsent(false);
+            }}
           >
             Saved demo
           </button>
         )}
         <button
           aria-pressed={tab === "upload"}
-          onClick={() => setTab("upload")}
+          onClick={() => {
+            setTab("upload");
+            setConsent(false);
+            setAiConsent(false);
+          }}
         >
           Upload statement
         </button>
         <button
           aria-pressed={tab === "nessie"}
-          onClick={() => setTab("nessie")}
+          onClick={() => {
+            setTab("nessie");
+            setConsent(false);
+            setAiConsent(false);
+          }}
         >
           Nessie simulation
         </button>
@@ -324,13 +338,21 @@ export function Sources({
             customer’s records, report unavailable feeds, and never turn
             incomplete API coverage into a favorable assumption.
           </p>
-          {demo ? (
+          {demo && !publicSandbox ? (
             <p className="caution">
               Sign in to connect the configured Nessie simulation. Saved demo
               data remains available without external services.
             </p>
           ) : (
             <>
+              {demo && (
+                <p className="caution">
+                  This server enables a dedicated public synthetic sandbox. Each
+                  demo has isolated interpretations and sharing. The same mock
+                  source records can be read by other demo users; never upload
+                  real personal information here.
+                </p>
+              )}
               <label className="checkbox">
                 <input
                   type="checkbox"

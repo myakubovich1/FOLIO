@@ -323,7 +323,7 @@ export class NessieClient {
         openingBalance: null,
         closingBalance: minor(String(account.balance)),
         minimumBalance: null,
-        obligationsDocumented: rows.some((r) => r.recordType === "bill"),
+        obligationsDocumented: false,
         reconciliation:
           "API records do not establish complete statement coverage or historical balances. Add a complete statement before receiving a scored result.",
       };

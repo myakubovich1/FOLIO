@@ -40,7 +40,7 @@ const categories: Category[] = [
 ];
 export function sampleCsv(profile = "newcomer") {
   const b = seed(profile);
-  const opening = profile === "farmer" ? 60000000 : 1000000;
+  const opening = b.openingBalance ?? 1000000;
   const closing = opening + b.records.reduce((n, r) => n + r.amount, 0);
   const headers = [
     "id",

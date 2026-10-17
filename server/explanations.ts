@@ -7,6 +7,7 @@ export const kinds = [
   "coverage",
   "exclusions",
   "seasonality",
+  "improvement",
   "limitation",
 ] as const;
 export type ClaimKind = (typeof kinds)[number];
@@ -33,6 +34,11 @@ export function evidenceTools(s: State) {
         missing: a.missing,
         model: a.model,
         revision: a.revision,
+        factors: a.factors.map((f) => ({
+          name: f.name,
+          points: f.points,
+          maximum: f.maximum,
+        })),
         incomePattern: s.borrower.incomePattern || "unknown",
       };
     },
@@ -112,6 +118,18 @@ export function paragraph(s: State, kind: ClaimKind) {
           .map((r) => r.id),
         metrics: [],
       };
+    case "improvement": {
+      const weakest = [...a.factors].sort(
+        (x, y) => x.points / x.maximum - y.points / y.maximum,
+      )[0];
+      return {
+        text: !weakest
+          ? "The next useful step is to supply the missing evidence listed above. A missing record cannot be replaced with a favorable assumption."
+          : `The smallest relative contribution is ${weakest.name}: ${weakest.points.toFixed(2)} of ${weakest.maximum} points. You can explore how lower observed expenses or a stronger documented cash buffer would change this model, without changing your records. These are conditional calculations, not a promise of credit approval.`,
+        evidence: weakest?.evidence.slice(0, 12) || [],
+        metrics: ["factors", "missing"],
+      };
+    }
     case "seasonality":
       return {
         text: b.seasonal
@@ -134,13 +152,15 @@ export function paragraph(s: State, kind: ClaimKind) {
 export function deterministicExplanation(s: State, question = ""): Explanation {
   if (!s.assessment)
     throw Error("Add records before requesting an explanation.");
-  const focus = /transfer|borrow|refund/i.test(question)
-    ? ["exclusions", "cashflow", "limitation"]
-    : /season|irregular|occupation/i.test(question)
-      ? ["seasonality", "coverage", "limitation"]
-      : /missing|no.*credit|history/i.test(question)
-        ? ["coverage", "limitation"]
-        : ["coverage", "factors", "cashflow", "liquidity", "limitation"];
+  const focus = /improv|next step|increase/i.test(question)
+    ? ["coverage", "improvement", "limitation"]
+    : /transfer|borrow|refund/i.test(question)
+      ? ["exclusions", "cashflow", "limitation"]
+      : /season|irregular|occupation/i.test(question)
+        ? ["seasonality", "coverage", "limitation"]
+        : /missing|no.*credit|history/i.test(question)
+          ? ["coverage", "limitation"]
+          : ["coverage", "factors", "cashflow", "liquidity", "limitation"];
   return {
     revision: s.revision,
     model: s.assessment.model,
@@ -162,7 +182,7 @@ export function validateClaims(
     "source-closing-balance",
     "source-minimum-balance",
   ]);
-  if (!claims.length || claims.length > 7)
+  if (!claims.length || claims.length > 8)
     throw Error("Unsupported explanation structure");
   for (const claim of claims) {
     if (

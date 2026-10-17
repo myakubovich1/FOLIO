@@ -712,7 +712,9 @@ function App() {
             <span className="demo-tag">
               {state.mode === "owner"
                 ? "PRIVATE ACCOUNT"
-                : "SAVED SYNTHETIC DEMO"}
+                : state.borrower.sourceKind === "sandbox"
+                  ? "NESSIE BANKING SIMULATION"
+                  : "SAVED SYNTHETIC DEMO"}
             </span>
             <div className="header-actions">
               {state.mode !== "owner" && identity?.authenticated && (
@@ -825,6 +827,35 @@ function App() {
                 {state.borrower.currency} · revision {state.revision}
               </span>
             </div>
+            {state.providerSync?.nessie && (
+              <section className="card provider-evidence">
+                <div className="eyebrow">
+                  NESSIE · LIVE API REQUEST · SYNTHETIC BANKING DATA
+                </div>
+                <h2>Your connection, in view.</h2>
+                <p>
+                  {state.providerSync.nessie.accounts} accounts ·{" "}
+                  {state.providerSync.nessie.records} normalized records · last
+                  successful read{" "}
+                  {new Date(state.providerSync.nessie.at).toLocaleString()}.
+                </p>
+                <p>
+                  These API records feed this assessment and any passport you
+                  issue. Missing statement coverage can produce an unscored
+                  result; the service never fills gaps with saved demo data.
+                </p>
+                <details>
+                  <summary>Inspect available feeds and gaps</summary>
+                  {Object.entries(state.providerSync.nessie.capabilities).map(
+                    ([feed, status]) => (
+                      <p key={feed}>
+                        {feed}: {status}
+                      </p>
+                    ),
+                  )}
+                </details>
+              </section>
+            )}
             {page !== "Settings" && (
               <ol className="journey" aria-label="Borrower journey">
                 {[
@@ -880,6 +911,7 @@ function App() {
                       <summary>Add or connect another source</summary>
                       <Sources
                         state={state}
+                        publicSandbox={health?.publicSandbox}
                         onState={setState}
                         onSaved={async () =>
                           setState(
@@ -899,6 +931,7 @@ function App() {
                 ) : (
                   <Sources
                     state={state}
+                    publicSandbox={health?.publicSandbox}
                     onState={setState}
                     onSaved={async () =>
                       setState(

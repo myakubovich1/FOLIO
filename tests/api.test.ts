@@ -32,6 +32,19 @@ test("complete journey, immutable snapshot, session isolation, expiry and revoca
       await call("connect", "POST", { consent: true }, cookie)
     ).json();
     assert.equal(connected.assessment.score, 71);
+    const legacy = structuredClone(connected);
+    delete legacy.assessment.monthly;
+    db.prepare("UPDATE folio_workspaces SET data=?").run(
+      JSON.stringify(legacy),
+    );
+    assert.ok(
+      (await (await call("state", "GET", undefined, cookie)).json()).assessment
+        .monthly.length,
+    );
+    assert.ok(
+      (await (await call("cashflow", "GET", undefined, cookie)).json()).rows
+        .length,
+    );
     const minted = await (await call("passports", "POST", {}, cookie)).json();
     const passport = minted.passports[0];
     assert.equal(passport.assessment.score, 71);

@@ -1,4 +1,10 @@
 import { test, expect } from "@playwright/test";
+test.beforeEach(async ({ page }) => {
+  page.on("console", (m) => {
+    if (m.type() === "error" && !m.text().includes("Failed to load resource"))
+      console.log("REACTERROR", m.text());
+  });
+});
 test("borrower, connect, correction, assessment, passport, recipient and revoke", async ({
   page,
   context,
@@ -62,6 +68,9 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
     .getByRole("button", { name: "Revoke link", exact: true })
     .last()
     .click();
+  await expect(
+    page.getByText("Link revoked. Future visits and downloads are blocked."),
+  ).toBeVisible();
   await recipient.reload();
   await expect(recipient.locator('.error[role="alert"]')).toContainText(
     "expired, revoked",

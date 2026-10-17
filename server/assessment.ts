@@ -76,7 +76,7 @@ export function assess(b: Borrower, revision = 1): Assessment {
   if (income <= 0 || expenses <= 0)
     missing.push("Positive documented income and expense totals");
   const averageExpenses = b.months > 0 ? expenses / b.months : 0;
-  const monthly = [...new Set(b.records.map((r) => r.date.slice(0, 7)))]
+  const monthly = [...new Set(active.map((r) => r.date.slice(0, 7)))]
     .sort()
     .map((month) => {
       const rows = active.filter((r) => r.date.startsWith(month));

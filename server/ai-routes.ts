@@ -10,7 +10,27 @@ import {
   suggestIncomePattern,
 } from "./gemini.js";
 export function registerAI(app: Express, store: Store) {
-  const counts = new Map<string, { time: number; count: number }>();
+  app.use(
+    ["/api/explanation", "/api/classifications", "/api/income-pattern"],
+    async (req, res, next) => {
+      if (
+        req.method !== "POST" ||
+        (req.originalUrl.split("?")[0] === "/api/explanation" &&
+          req.body?.provider !== "gemini")
+      ) {
+        next();
+        return;
+      }
+      if (!(await store.takeProviderBudget(res.locals.owner, "gemini"))) {
+        res.status(429).json({
+          error:
+            "Please wait one minute before another AI request. Manual review and calculated explanations remain available.",
+        });
+        return;
+      }
+      next();
+    },
+  );
   app.post("/api/explanation", async (req, res) => {
     const { question, provider, consent } = z
       .object({
@@ -37,21 +57,6 @@ export function registerAI(app: Express, store: Store) {
       return;
     }
     const owner = res.locals.owner as string;
-    if (provider === "gemini") {
-      const count = counts.get(owner);
-      if (count && Date.now() - count.time < 60000 && count.count >= 4) {
-        res.status(429).json({
-          error:
-            "Please wait one minute before requesting another AI explanation.",
-        });
-        return;
-      }
-      counts.set(owner, {
-        time:
-          count && Date.now() - count.time < 60000 ? count.time : Date.now(),
-        count: count && Date.now() - count.time < 60000 ? count.count + 1 : 1,
-      });
-    }
     try {
       const explanation =
         provider === "gemini"
@@ -85,14 +90,12 @@ export function registerAI(app: Express, store: Store) {
       });
       res.json(result.state);
     } catch (e) {
-      res
-        .status(503)
-        .json({
-          error:
-            e instanceof ProviderUnavailable
-              ? e.message
-              : "Pattern suggestion is unavailable. You can confirm your income pattern manually.",
-        });
+      res.status(503).json({
+        error:
+          e instanceof ProviderUnavailable
+            ? e.message
+            : "Pattern suggestion is unavailable. You can confirm your income pattern manually.",
+      });
     }
   });
   app.post("/api/classifications", async (req, res) => {

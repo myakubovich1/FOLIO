@@ -21,3 +21,27 @@ test("deletion serializes with mutations and requires explicit recreation", asyn
     await s.close();
   }
 });
+
+test("SQLite startup recovers an interrupted deletion marker", async () => {
+  const { mkdtempSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const dir = mkdtempSync(join(tmpdir(), "folio-delete-"));
+  const path = join(dir, "test.sqlite");
+  const first = new Store(path);
+  await first.init();
+  await first.query(
+    "INSERT INTO folio_tombstones(owner,complete) VALUES($1,0)",
+    ["interrupted"],
+  );
+  await first.close();
+  const second = new Store(path);
+  await second.init();
+  try {
+    await second.create("interrupted", ownerState(), true);
+    assert.ok(await second.get("interrupted"));
+  } finally {
+    await second.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

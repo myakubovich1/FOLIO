@@ -63,6 +63,10 @@ export class Store {
     this.db!.exec(
       "CREATE TABLE IF NOT EXISTS folio_tombstones(owner TEXT PRIMARY KEY,complete INTEGER NOT NULL DEFAULT 0); CREATE TABLE IF NOT EXISTS folio_previews(id TEXT PRIMARY KEY,owner TEXT NOT NULL REFERENCES folio_owners(id) ON DELETE CASCADE,data TEXT NOT NULL,expires INTEGER NOT NULL)",
     );
+    this.db!.exec("UPDATE folio_tombstones SET complete=1 WHERE complete=0");
+    this.db!.exec(
+      "CREATE TABLE IF NOT EXISTS folio_provider_limits(owner TEXT NOT NULL REFERENCES folio_owners(id) ON DELETE CASCADE,scope TEXT NOT NULL,window_start INTEGER NOT NULL,count INTEGER NOT NULL,PRIMARY KEY(owner,scope));",
+    );
     // Upgrade the original local synthetic-only prototype without losing its sessions or shares.
     if (
       this.db!.prepare(
@@ -304,6 +308,34 @@ export class Store {
       event,
     ]);
   }
+  async takeProviderBudget(
+    owner: string,
+    scope: string,
+    limit = 8,
+    windowMs = 60000,
+  ) {
+    const result = await this.mutate(owner, async (_state, q) => {
+      const rows = await q(
+        "SELECT window_start,count FROM folio_provider_limits WHERE owner=$1 AND scope=$2",
+        [owner, scope],
+      );
+      const now = Date.now();
+      if (!rows[0] || now - Number(rows[0].window_start) >= windowMs) {
+        await q(
+          "INSERT INTO folio_provider_limits(owner,scope,window_start,count) VALUES($1,$2,$3,1) ON CONFLICT(owner,scope) DO UPDATE SET window_start=excluded.window_start,count=1",
+          [owner, scope, now],
+        );
+        return true;
+      }
+      if (Number(rows[0].count) >= limit) return false;
+      await q(
+        "UPDATE folio_provider_limits SET count=count+1 WHERE owner=$1 AND scope=$2",
+        [owner, scope],
+      );
+      return true;
+    });
+    return result.value;
+  }
   async cashflow(owner: string) {
     await this.pending;
     const state = await this.get(owner);
@@ -315,8 +347,7 @@ export class Store {
         rows: [],
       };
     if (!this.pool) {
-      const s = await this.get(owner);
-      return { backend: "local SQLite", rows: s?.assessment?.monthly || [] };
+      return { backend: "local SQLite", rows: state.assessment?.monthly || [] };
     }
     await this.refresh(owner);
     const rows = await this.query(

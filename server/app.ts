@@ -135,6 +135,7 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
       ok: true,
       storage: store.pool ? "Tiger Data / PostgreSQL" : "local demo SQLite",
       providers: providerStatus(),
+      publicSandbox: process.env.FOLIO_PUBLIC_SANDBOX === "true",
     }),
   );
   app.get("/api/identity", (req, res) => {
@@ -274,9 +275,13 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
     next();
   });
   app.get("/api/state", async (_req, res) => {
-    const state: State = res.locals.state;
-    if (state.assessment && !state.assessment.monthly)
-      state.assessment = assess(state.borrower, state.revision);
+    let state: State = res.locals.state;
+    if (state.assessment && !state.assessment.monthly) {
+      const migrated = await store.mutate(res.locals.owner, (s) => {
+        s.assessment = assess(s.borrower, s.revision);
+      });
+      state = migrated.state;
+    }
     res.json(state);
   });
   app.post("/api/context", async (req, res) => {

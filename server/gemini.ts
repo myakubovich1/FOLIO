@@ -75,7 +75,7 @@ export async function geminiExplanation(
             .strict(),
         )
         .min(1)
-        .max(7),
+        .max(8),
     })
     .strict();
   const input = JSON.stringify({
