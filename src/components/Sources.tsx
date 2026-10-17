@@ -137,7 +137,7 @@ export function Sources({
           </label>
           <button
             className="primary"
-            disabled={!consent || busy}
+            disabled={!consent || busy || state.connected}
             onClick={() =>
               run(async () => {
                 await onSaved();
@@ -147,6 +147,12 @@ export function Sources({
           >
             Use saved records
           </button>
+          {state.connected && (
+            <p className="fine">
+              A source is already connected. Choose a fresh demo profile to
+              switch to saved records.
+            </p>
+          )}
         </div>
       )}
       {tab === "upload" && (

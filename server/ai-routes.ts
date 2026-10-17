@@ -1,3 +1,4 @@
+import { reserveProviderCall } from "./provider-budget.js";
 import type { Express } from "express";
 import { z } from "zod";
 import type { Store } from "./store.js";
@@ -21,7 +22,7 @@ export function registerAI(app: Express, store: Store) {
         next();
         return;
       }
-      if (!(await store.takeProviderBudget(res.locals.owner, "gemini"))) {
+      if (!(await reserveProviderCall(store, res.locals.owner, "gemini"))) {
         res.status(429).json({
           error:
             "Please wait one minute before another AI request. Manual review and calculated explanations remain available.",

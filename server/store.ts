@@ -8,6 +8,7 @@ type Row = Record<string, unknown>;
 type Query = (sql: string, params?: unknown[]) => Promise<Row[]>;
 const parse = <T>(value: unknown): T =>
   typeof value === "string" ? JSON.parse(value) : (value as T);
+export class CleanupPendingError extends Error {}
 export class Store {
   readonly db: DatabaseSync | null;
   readonly pool: Pool | null;
@@ -25,8 +26,15 @@ export class Store {
   }
   async query(sql: string, params: unknown[] = []): Promise<Row[]> {
     if (this.pool) return (await this.pool.query(sql, params)).rows;
-    const statement = this.db!.prepare(sql.replace(/\$\d+/g, "?"));
-    return statement.all(...(params as (string | number | null)[])) as Row[];
+    const ordered: unknown[] = [];
+    const mapped = sql.replace(/\$(\d+)/g, (_token, index) => {
+      ordered.push(params[Number(index) - 1]);
+      return "?";
+    });
+    const statement = this.db!.prepare(mapped);
+    return statement.all(
+      ...((ordered.length ? ordered : params) as (string | number | null)[]),
+    ) as Row[];
   }
   async init() {
     this.cleanupTimer = setInterval(() => {
@@ -43,12 +51,10 @@ export class Store {
         "SELECT owner FROM folio_tombstones WHERE complete=0",
       );
       if (incomplete.length) {
-        await this.query(
-          "CALL refresh_continuous_aggregate('folio_daily_cashflow', NULL::date, NULL::date)",
-        );
-        await this.query(
-          "UPDATE folio_tombstones SET complete=1 WHERE complete=0",
-        );
+        if (await this.finishDeletionCleanup())
+          await this.query(
+            "UPDATE folio_tombstones SET complete=1 WHERE complete=0",
+          );
       }
       return;
     }
@@ -66,6 +72,9 @@ export class Store {
     this.db!.exec("UPDATE folio_tombstones SET complete=1 WHERE complete=0");
     this.db!.exec(
       "CREATE TABLE IF NOT EXISTS folio_provider_limits(owner TEXT NOT NULL REFERENCES folio_owners(id) ON DELETE CASCADE,scope TEXT NOT NULL,window_start INTEGER NOT NULL,count INTEGER NOT NULL,PRIMARY KEY(owner,scope));",
+    );
+    this.db!.exec(
+      "CREATE TABLE IF NOT EXISTS folio_service_limits(scope TEXT PRIMARY KEY,window_start INTEGER NOT NULL,count INTEGER NOT NULL);",
     );
     // Upgrade the original local synthetic-only prototype without losing its sessions or shares.
     if (
@@ -129,8 +138,38 @@ export class Store {
       ).length > 0
     );
   }
+  private async finishDeletionCleanup(): Promise<boolean> {
+    if (!this.pool) return true;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        await this.query(
+          "CALL refresh_continuous_aggregate('folio_daily_cashflow', NULL::date, NULL::date)",
+        );
+        return true;
+      } catch {
+        /* A tombstone continues denying access; never clear it on failed refresh. */
+      }
+    }
+    return false;
+  }
   async create(owner: string, state: State, recreate = false) {
     return this.serial(async () => {
+      if (recreate && this.pool) {
+        const pending = await this.query(
+          "SELECT complete FROM folio_tombstones WHERE owner=$1",
+          [owner],
+        );
+        if (pending.length && Number(pending[0].complete) === 0) {
+          if (!(await this.finishDeletionCleanup()))
+            throw new CleanupPendingError(
+              "Your deleted data remains inaccessible. Analytics cleanup is temporarily unavailable; retry a fresh start after the database service recovers.",
+            );
+          await this.query(
+            "UPDATE folio_tombstones SET complete=1 WHERE owner=$1",
+            [owner],
+          );
+        }
+      }
       const client = this.pool ? await this.pool.connect() : undefined;
       const q: Query = client
         ? async (sql, p) => (await client.query(sql, p)).rows
@@ -314,62 +353,65 @@ export class Store {
     limit = 8,
     windowMs = 60000,
   ) {
-    const result = await this.mutate(owner, async (_state, q) => {
-      const rows = await q(
-        "SELECT window_start,count FROM folio_provider_limits WHERE owner=$1 AND scope=$2",
-        [owner, scope],
+    return this.serial(async () => {
+      const now = Date.now(),
+        cutoff = now - windowMs;
+      const rows = await this.query(
+        "INSERT INTO folio_provider_limits(owner,scope,window_start,count) SELECT id,$2,$3,1 FROM folio_owners WHERE id=$1 ON CONFLICT(owner,scope) DO UPDATE SET count=CASE WHEN folio_provider_limits.window_start<=$4 THEN 1 ELSE folio_provider_limits.count+1 END,window_start=CASE WHEN folio_provider_limits.window_start<=$5 THEN excluded.window_start ELSE folio_provider_limits.window_start END WHERE folio_provider_limits.window_start<=$6 OR folio_provider_limits.count<$7 RETURNING count",
+        [owner, scope, now, cutoff, cutoff, cutoff, limit],
       );
-      const now = Date.now();
-      if (!rows[0] || now - Number(rows[0].window_start) >= windowMs) {
-        await q(
-          "INSERT INTO folio_provider_limits(owner,scope,window_start,count) VALUES($1,$2,$3,1) ON CONFLICT(owner,scope) DO UPDATE SET window_start=excluded.window_start,count=1",
-          [owner, scope, now],
-        );
-        return true;
-      }
-      if (Number(rows[0].count) >= limit) return false;
-      await q(
-        "UPDATE folio_provider_limits SET count=count+1 WHERE owner=$1 AND scope=$2",
-        [owner, scope],
-      );
-      return true;
+      return rows.length > 0;
     });
-    return result.value;
+  }
+  async takeServiceBudget(scope: string, limit: number, windowMs = 60000) {
+    return this.serial(async () => {
+      const now = Date.now(),
+        cutoff = now - windowMs;
+      const rows = await this.query(
+        "INSERT INTO folio_service_limits(scope,window_start,count) VALUES($1,$2,1) ON CONFLICT(scope) DO UPDATE SET count=CASE WHEN folio_service_limits.window_start<=$3 THEN 1 ELSE folio_service_limits.count+1 END,window_start=CASE WHEN folio_service_limits.window_start<=$4 THEN excluded.window_start ELSE folio_service_limits.window_start END WHERE folio_service_limits.window_start<=$5 OR folio_service_limits.count<$6 RETURNING count",
+        [scope, now, cutoff, cutoff, cutoff, limit],
+      );
+      return rows.length > 0;
+    });
   }
   async cashflow(owner: string) {
-    await this.pending;
-    const state = await this.get(owner);
-    if (!state || (await this.isDeleted(owner)))
-      return {
-        backend: this.pool
-          ? "TimescaleDB continuous aggregate"
-          : "local SQLite",
-        rows: [],
-      };
-    if (!this.pool) {
-      return { backend: "local SQLite", rows: state.assessment?.monthly || [] };
-    }
-    await this.refresh(owner);
-    const rows = await this.query(
-      "SELECT to_char(bucket,'YYYY-MM') AS month,sum(income) AS income,sum(spending) AS spending,sum(refunds) AS refunds FROM folio_daily_cashflow WHERE owner=$1 AND currency=$2 AND EXISTS(SELECT 1 FROM folio_workspaces w WHERE w.owner=$1) AND NOT EXISTS(SELECT 1 FROM folio_tombstones t WHERE t.owner=$1) GROUP BY month ORDER BY month",
-      [owner, state.borrower.currency],
-    );
-    const monthly = rows.map((r) => ({
-      month: String(r.month),
-      income: Number(r.income),
-      spending: Number(r.spending),
-      refunds: Number(r.refunds),
-    }));
-    if (
-      monthly.some(
-        (r) => ![r.income, r.spending, r.refunds].every(Number.isSafeInteger),
+    return this.serial(async () => {
+      const state = await this.get(owner);
+      if (!state || (await this.isDeleted(owner)))
+        return {
+          backend: this.pool
+            ? "TimescaleDB continuous aggregate"
+            : "local SQLite",
+          rows: [],
+        };
+      if (!this.pool) {
+        return {
+          backend: "local SQLite",
+          rows: state.assessment?.monthly || [],
+        };
+      }
+      await this.refresh(owner);
+      const rows = await this.query(
+        "SELECT to_char(bucket,'YYYY-MM') AS month,sum(income) AS income,sum(spending) AS spending,sum(refunds) AS refunds FROM folio_daily_cashflow WHERE owner=$1 AND currency=$2 AND EXISTS(SELECT 1 FROM folio_workspaces w WHERE w.owner=$1) AND NOT EXISTS(SELECT 1 FROM folio_tombstones t WHERE t.owner=$1) GROUP BY month ORDER BY month",
+        [owner, state.borrower.currency],
+      );
+      const monthly = rows.map((r) => ({
+        month: String(r.month),
+        income: Number(r.income),
+        spending: Number(r.spending),
+        refunds: Number(r.refunds),
+      }));
+      if (
+        monthly.some(
+          (r) => ![r.income, r.spending, r.refunds].every(Number.isSafeInteger),
+        )
       )
-    )
-      throw new Error("Analytics total exceeds exact-number range");
-    return {
-      backend: "TimescaleDB continuous aggregate (refreshed + real-time)",
-      rows: monthly,
-    };
+        throw new Error("Analytics total exceeds exact-number range");
+      return {
+        backend: "TimescaleDB continuous aggregate (refreshed + real-time)",
+        rows: monthly,
+      };
+    });
   }
 
   async refresh(owner: string) {
@@ -409,14 +451,13 @@ export class Store {
       } finally {
         client?.release();
       }
-      if (this.pool)
+      const complete = await this.finishDeletionCleanup();
+      if (complete)
         await this.query(
-          "CALL refresh_continuous_aggregate('folio_daily_cashflow', NULL::date, NULL::date)",
+          "UPDATE folio_tombstones SET complete=1 WHERE owner=$1",
+          [owner],
         );
-      await this.query(
-        "UPDATE folio_tombstones SET complete=1 WHERE owner=$1",
-        [owner],
-      );
+      return { cleanupPending: !complete };
     });
   }
   async close() {

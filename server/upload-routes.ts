@@ -1,3 +1,4 @@
+import { reserveProviderCall } from "./provider-budget.js";
 import type { Express } from "express";
 import multer from "multer";
 import { z } from "zod";
@@ -44,7 +45,7 @@ export function registerUploads(app: Express, store: Store) {
         });
         return;
       }
-      if (!(await store.takeProviderBudget(res.locals.owner, "gemini"))) {
+      if (!(await reserveProviderCall(store, res.locals.owner, "gemini"))) {
         res.status(429).json({
           error:
             "Please wait one minute before another AI request, or use CSV/manual review.",

@@ -64,6 +64,31 @@ test(
       } finally {
         await replica.close();
       }
+      const originalQuery = store.query.bind(store);
+      store.query = async (sql, params) => {
+        if (sql.startsWith("CALL refresh_continuous_aggregate"))
+          throw Error("simulated maintenance");
+        return originalQuery(sql, params);
+      };
+      try {
+        assert.equal((await store.delete(owner)).cleanupPending, true);
+        assert.equal((await store.cashflow(owner)).rows.length, 0);
+        await assert.rejects(
+          store.create(owner, demoState("newcomer"), true),
+          /temporarily unavailable/,
+        );
+      } finally {
+        store.query = originalQuery;
+      }
+      const empty = demoState("newcomer");
+      empty.borrower.records = [];
+      empty.connected = false;
+      await store.create(owner, empty, true);
+      assert.equal(
+        (await store.cashflow(owner)).rows.length,
+        0,
+        "old aggregate history cannot return after recreation",
+      );
       await store.delete(owner);
       assert.equal((await store.cashflow(owner)).rows.length, 0);
       assert.ok(await store.get(other));

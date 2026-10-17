@@ -242,3 +242,64 @@ test("responsive visual and accessibility pass", async ({ page }, info) => {
   );
   expect(violations).toEqual([]);
 });
+
+test("Nessie and Gemini failures have visible recovery without invented provider success", async ({
+  page,
+}) => {
+  await page.route("**/api/health", (r) =>
+    r.fulfill({
+      json: {
+        ok: true,
+        storage: "Test fixture",
+        providers: { auth0: false, tiger: false, nessie: false, gemini: false },
+        publicSandbox: true,
+      },
+    }),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: /Build your demo/ }).click();
+  await page
+    .getByRole("button", { name: "Nessie simulation", exact: true })
+    .click();
+  await page.getByRole("checkbox", { name: /permit reading/ }).check();
+  await page.route("**/api/nessie/sync", (r) =>
+    r.fulfill({
+      status: 503,
+      json: {
+        error:
+          "The Nessie service is unavailable. Retry or use saved synthetic records.",
+      },
+    }),
+  );
+  await page
+    .getByRole("button", { name: "Synchronize Nessie records" })
+    .click();
+  await expect(page.locator(".error")).toContainText(
+    "Nessie service is unavailable",
+  );
+  await page.getByRole("button", { name: "Saved demo", exact: true }).click();
+  await expect(page.getByRole("checkbox")).not.toBeChecked();
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Use saved records" }).click();
+  await page.getByRole("button", { name: "See assessment →" }).click();
+  await page.getByRole("checkbox", { name: /Use Gemini for/ }).check();
+  await page
+    .getByRole("checkbox", { name: /Send only the current metrics/ })
+    .check();
+  await page.route("**/api/explanation", (r) =>
+    r.fulfill({
+      status: 503,
+      json: { error: "Gemini is temporarily unavailable." },
+    }),
+  );
+  await page.getByRole("button", { name: "Explain my evidence" }).click();
+  await expect(page.locator(".error")).toContainText(
+    "Gemini is temporarily unavailable",
+  );
+  await page.unroute("**/api/explanation");
+  await page.getByRole("checkbox", { name: /Use Gemini for/ }).uncheck();
+  await page.getByRole("button", { name: "Explain my evidence" }).click();
+  await expect(
+    page.getByText(/Calculated explanation · no AI request/),
+  ).toBeVisible();
+});

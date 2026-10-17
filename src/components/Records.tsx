@@ -305,6 +305,19 @@ export function Records({
               {state.patternSuggestion.evidence.length} supporting income
               records. Confirming seasonal income requires two complete years.
             </p>
+            <details>
+              <summary>Inspect supporting income records</summary>
+              {state.patternSuggestion.evidence.map((id) => {
+                const r = state.borrower.records.find((r) => r.id === id);
+                return (
+                  <p key={id}>
+                    {r
+                      ? `${r.date} · ${money(r.amount, r.currency)} · ${r.description}`
+                      : id}
+                  </p>
+                );
+              })}
+            </details>
             <button
               disabled={Boolean(busy)}
               onClick={async () => {

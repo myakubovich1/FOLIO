@@ -42,6 +42,9 @@ test("structured extraction verifies exact amounts, source pages, calendar and u
   assert.equal(p.rows[0].amount, 20000);
   assert.match(p.rows[0].sourceLocation!, /PDF page 1/);
   assert.equal(p.rows[0].interpretation, "model-suggested");
+  assert.equal(p.rows[0].recordType, "transaction");
+  assert.equal(p.rows[1].recordType, "payment");
+  assert.equal(p.rows[0].linkedRecordId, undefined);
   assert.throws(
     () =>
       previewExtraction(
@@ -64,4 +67,34 @@ test("structured extraction verifies exact amounts, source pages, calendar and u
     1,
   );
   assert.ok(malformed.errors.length);
+});
+
+test("PDF normalization preserves bill/payment pairing so one obligation is counted once", () => {
+  const rows = [
+    statement.rows[0],
+    {
+      ...statement.rows[1],
+      record_type: "payment",
+      linked_record_id: "bill",
+    },
+    {
+      ...statement.rows[1],
+      id: "bill",
+      record_type: "bill",
+      linked_record_id: "expense",
+    },
+  ];
+  const preview = previewExtraction(
+    { ...statement, rows },
+    "bill-and-payment.pdf",
+    1,
+  );
+  assert.equal(preview.reconciled, true);
+  assert.equal(preview.rows.filter((r) => r.excludedReason).length, 1);
+  assert.equal(
+    preview.rows
+      .filter((r) => !r.excludedReason && r.category === "expense")
+      .reduce((n, r) => n - r.amount, 0),
+    10000,
+  );
 });

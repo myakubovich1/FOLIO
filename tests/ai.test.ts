@@ -79,3 +79,81 @@ test("issued model configuration and figures stay immutable when current inputs 
   assert.equal(issued.assessment.score, 71);
   assert.equal(issued.assessment.revision, 1);
 });
+
+test("unsupported numerical claims and incompatible classification evidence are rejected", async () => {
+  const { explanationEnvelope, validateSuggestions } =
+    await import("../server/gemini.js");
+  assert.equal(
+    explanationEnvelope.safeParse({
+      claims: [{ kind: "cashflow", evidence: [], score: 999 }],
+    }).success,
+    false,
+  );
+  const rows = [
+    {
+      id: "deposit",
+      date: "2025-01-01",
+      amount: 200,
+      currency: "USD",
+      description: "Deposit",
+      category: "unknown",
+      originalCategory: "unknown",
+    },
+    {
+      id: "outflow",
+      date: "2025-01-02",
+      amount: -100,
+      currency: "USD",
+      description: "Withdrawal",
+      category: "unknown",
+      originalCategory: "unknown",
+    },
+  ] as import("../src/contracts.js").RecordRow[];
+  assert.throws(
+    () =>
+      validateSuggestions(rows, [
+        {
+          id: "deposit",
+          category: "income",
+          reason: "explicit-income",
+          evidence: ["deposit", "outflow"],
+        },
+      ]),
+    /conflicts/,
+  );
+  assert.throws(
+    () =>
+      validateSuggestions(rows, [
+        {
+          id: "outflow",
+          category: "income",
+          reason: "explicit-income",
+          evidence: ["outflow"],
+        },
+      ]),
+    /conflicts/,
+  );
+  assert.throws(
+    () =>
+      validateSuggestions(rows, [
+        {
+          id: "deposit",
+          category: "income",
+          reason: "explicit-income",
+          evidence: ["outflow"],
+        },
+      ]),
+    /unsupported/,
+  );
+  assert.equal(
+    validateSuggestions(rows, [
+      {
+        id: "deposit",
+        category: "unknown",
+        reason: "insufficient-evidence",
+        evidence: ["deposit"],
+      },
+    ])[0].category,
+    "unknown",
+  );
+});

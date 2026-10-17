@@ -359,6 +359,10 @@ export function applyImport(s: State, preview: ImportPreview) {
     throw Error(
       "The file currency differs from your profile. Change the profile currency before adding records.",
     );
+  if (s.connected && s.sources?.some((source) => source.id === "saved-demo"))
+    throw Error(
+      "This workspace already uses the saved synthetic statement. Choose a fresh demo profile before importing its CSV copy; the same evidence must not count twice.",
+    );
   const before = JSON.stringify(s.borrower);
   if (!s.connected) {
     s.borrower.records = [];

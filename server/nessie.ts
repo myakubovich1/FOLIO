@@ -35,6 +35,7 @@ export class NessieClient {
   private base: string;
   readonly customer: string;
   private fetcher: typeof fetch;
+  private deadline?: number;
   constructor(options: NessieOptions = {}) {
     this.key = options.key || process.env.NESSIE_API_KEY || "";
     this.base =
@@ -55,15 +56,23 @@ export class NessieClient {
     method = "GET",
     body?: unknown,
   ): Promise<unknown> {
+    const remaining = () =>
+      this.deadline ? this.deadline - Date.now() : 10000;
     const url = new URL(path, this.base);
     url.searchParams.set("key", this.key);
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
+        if (remaining() <= 0)
+          throw new ProviderUnavailable(
+            "Nessie synchronization timed out. Retry with fewer dedicated sandbox accounts; saved records are unchanged.",
+          );
         const response = await this.fetcher(url, {
           method,
           headers: { "content-type": "application/json" },
           body: body === undefined ? undefined : JSON.stringify(body),
-          signal: AbortSignal.timeout(10000),
+          signal: AbortSignal.timeout(
+            Math.max(1, Math.min(10000, remaining())),
+          ),
           redirect: "error",
         });
         if (!response.ok) {
@@ -89,6 +98,7 @@ export class NessieClient {
     previews: ImportPreview[];
     capabilities: Record<string, string>;
   }> {
+    this.deadline = Date.now() + 30000;
     const accounts = z
       .array(accountSchema)
       .parse(

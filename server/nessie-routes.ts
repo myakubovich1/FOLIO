@@ -1,3 +1,4 @@
+import { reserveProviderCall } from "./provider-budget.js";
 import type { Express } from "express";
 import { z } from "zod";
 import type { Store } from "./store.js";
@@ -33,7 +34,7 @@ export function registerNessie(app: Express, store: Store) {
       });
       return;
     }
-    if (!(await store.takeProviderBudget(res.locals.owner, "nessie", 4))) {
+    if (!(await reserveProviderCall(store, res.locals.owner, "nessie"))) {
       res.status(429).json({
         error:
           "Wait one minute before another Nessie synchronization. Your saved records remain available.",

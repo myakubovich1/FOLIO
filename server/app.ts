@@ -3,7 +3,7 @@ import onHeaders from "on-headers";
 import { auth } from "express-openid-connect";
 import { randomBytes, createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
-import { Store } from "./store.js";
+import { Store, CleanupPendingError } from "./store.js";
 import { registerNessie } from "./nessie-routes.js";
 import { registerAI } from "./ai-routes.js";
 import { snapshot } from "./passports.js";
@@ -298,6 +298,17 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
         ]),
       })
       .parse(req.body);
+    const current: State = res.locals.state;
+    if (
+      current.borrower.records.length &&
+      current.borrower.currency !== context.currency
+    ) {
+      res.status(409).json({
+        error:
+          "Existing source records use a fixed currency. Choose another synthetic profile, or delete your private workspace data before changing currency. Disconnecting retains history.",
+      });
+      return;
+    }
     const result = await store.mutate(res.locals.owner, (s) => {
       if (s.borrower.records.length && s.borrower.currency !== context.currency)
         throw new Error(
@@ -316,7 +327,38 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
   });
   app.post("/api/connect", async (req, res) => {
     z.object({ consent: z.literal(true) }).parse(req.body);
+    const current: State = res.locals.state;
+    if (current.mode === "owner") {
+      res.status(403).json({
+        error: "Use an upload or a configured source in your private account.",
+      });
+      return;
+    }
+    if (current.connected) {
+      if (
+        current.sources?.length === 1 &&
+        current.sources[0].id === "saved-demo" &&
+        current.borrower.sourceKind === "synthetic"
+      ) {
+        res.json(current);
+        return;
+      }
+      res.status(409).json({
+        error:
+          "This workspace already uses a different source. Choose a fresh demo profile before connecting saved records; your current records and reports are preserved.",
+      });
+      return;
+    }
     const result = await store.mutate(res.locals.owner, (s) => {
+      if (
+        s.connected &&
+        (s.sources?.length !== 1 ||
+          s.sources[0].id !== "saved-demo" ||
+          s.borrower.sourceKind !== "synthetic")
+      )
+        throw Error(
+          "Source changed. Start a fresh demo before switching evidence types.",
+        );
       if (s.mode === "owner")
         throw new Error(
           "Choose an upload or a configured source for your private account.",
@@ -331,6 +373,13 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
           consentedAt: new Date().toISOString(),
           coverageStart: s.borrower.start,
           coverageEnd: s.borrower.end,
+          openingBalance: s.borrower.openingBalance,
+          closingBalance: s.borrower.closingBalance,
+          minimumBalance: s.borrower.minimumBalance,
+          accountId: `synthetic-${s.borrower.id}`,
+          accountType: "checking",
+          complete: s.borrower.complete,
+          obligationsDocumented: s.borrower.obligationsDocumented,
         },
       ];
       s.assessment = assess(s.borrower, s.revision);
@@ -511,13 +560,15 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
   });
   app.delete("/api/data", async (req, res) => {
     z.object({ confirm: z.literal("DELETE") }).parse(req.body);
-    await store.delete(res.locals.owner);
+    const deletion = await store.delete(res.locals.owner);
     res.clearCookie("folio_session", { path: "/" });
     res.clearCookie("folio_mode", { path: "/" });
     res.json({
       deleted: true,
-      message:
-        "Your application records, derived assessments and shares were deleted. This does not recall downloaded reports or erase provider data/backups.",
+      cleanupPending: deletion.cleanupPending,
+      message: deletion.cleanupPending
+        ? "Your application records and sharing access were deleted. Analytics cleanup is pending and remains inaccessible. Retry a fresh start when database maintenance is complete. Downloaded/provider copies are unaffected."
+        : "Your application records, derived assessments and shares were deleted. This does not recall downloaded reports or erase provider data/backups.",
     });
   });
   registerUploads(app, store);
@@ -530,6 +581,10 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
       res: express.Response,
       _next: express.NextFunction,
     ) => {
+      if (error instanceof CleanupPendingError) {
+        res.status(503).json({ error: error.message });
+        return;
+      }
       const validation = error instanceof z.ZodError;
       res.status(validation ? 400 : 500).json({
         error: validation

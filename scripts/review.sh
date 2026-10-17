@@ -22,7 +22,7 @@ prompt="$snapshot/review-prompt.txt"
  printf '\nRead src/contracts.ts, server/*.ts, src/main.tsx, src/style.css and tests/*.ts. Return actionable findings and checks not performed.\n'
  printf '\nCheckpoint focus: %s\n' "${FOLIO_REVIEW_FOCUS:-Review the current product checkpoint for correctness, financial explanations, UX and access boundaries.}"
  printf '\nCurrent source root: %s. Ignore any older source paths in conversation history.\n' "$snapshot"
- if [[ -n "${2:-}" ]]; then printf '\nThis is a focused follow-up to your completed review: verify only the prior transaction-direction and monthly-chart P2 findings and the small UX fixes in server/assessment.ts and src/main.tsx. Do not repeat the full requirements review. Return at most five actionable findings, or say those fixes are confirmed by source inspection. Keep the response concise; no test execution is available.\n'; fi
+ if [[ -n "${2:-}" ]]; then printf '\nThis is a focused follow-up to your completed review. Verify the prior findings and the specific repair/new-change scope supplied in Checkpoint focus above. Do not repeat the full requirements review. Return at most five actionable findings, or confirm the scoped repairs by source inspection. Keep the response concise; no test execution is available.\n'; fi
 } > "$prompt"
 out="$PWD/reviews/$commit.json"
 claude_args=(-p --permission-mode dontAsk --tools Read,Glob,Grep --allowedTools Read,Glob,Grep --disallowedTools Bash,Edit,Write,Agent,Task,NotebookEdit --disable-slash-commands --setting-sources '' --strict-mcp-config --mcp-config "$snapshot/empty-mcp.json" --settings '{"disableAllHooks":true}' --output-format json)

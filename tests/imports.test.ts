@@ -148,3 +148,36 @@ test("overlapping statement windows reconcile a deduplicated account; gaps absta
   assert.equal(gap.borrower.complete, false);
   assert.equal(assess(gap.borrower).score, null);
 });
+
+test("saved-demo evidence cannot be double-counted by importing its CSV copy", () => {
+  const s = ownerState();
+  s.mode = "demo";
+  s.connected = true;
+  s.sources = [
+    {
+      id: "saved-demo",
+      kind: "synthetic",
+      label: "Saved demo",
+      connected: true,
+      consentedAt: new Date().toISOString(),
+    },
+  ];
+  assert.throws(
+    () => applyImport(s, previewCsv(sampleCsv(), "duplicate.csv")),
+    /same evidence/,
+  );
+});
+
+test("saved and CSV representations of every complete profile reproduce the same score and balances", async () => {
+  const { seed, profiles } = await import("../server/seeds.js");
+  for (const p of profiles.filter((p) => p.id !== "limited")) {
+    const expected = seed(p.id);
+    const state = ownerState();
+    state.borrower.currency = expected.currency;
+    state.borrower.seasonal = expected.seasonal;
+    applyImport(state, previewCsv(sampleCsv(p.id), `${p.id}.csv`));
+    assert.equal(state.borrower.closingBalance, expected.closingBalance);
+    assert.equal(state.borrower.minimumBalance, expected.minimumBalance);
+    assert.equal(assess(state.borrower).score, assess(expected).score);
+  }
+});

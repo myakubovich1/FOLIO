@@ -827,6 +827,17 @@ function App() {
                 {state.borrower.currency} · revision {state.revision}
               </span>
             </div>
+            {state.mode === "demo" &&
+              state.borrower.complete &&
+              state.borrower.openingBalance === undefined &&
+              state.sources?.some((source) => source.id === "saved-demo") && (
+                <p className="caution">
+                  This historical saved demo predates the reconciled statement
+                  fixtures. Choose a fresh profile for the current
+                  demonstration; your existing records and issued reports remain
+                  preserved.
+                </p>
+              )}
             {state.providerSync?.nessie && (
               <section className="card provider-evidence">
                 <div className="eyebrow">
@@ -1069,7 +1080,7 @@ function Context({
         <select
           id="market"
           value={currency}
-          disabled={state.borrower.records.length > 0 && state.connected}
+          disabled={state.borrower.records.length > 0}
           onChange={(e) => setCurrency(e.target.value as "USD" | "KES")}
         >
           <option value="USD">United States · USD</option>
