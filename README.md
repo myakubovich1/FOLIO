@@ -47,7 +47,7 @@ npm run verify:persistence
 npm run export:demo
 ```
 
-`FOLIO_TEST_DATABASE_URL` enables actual database tests; keep that URI in local process configuration. `verify:persistence` starts temporary production app processes on3103 and cleans up its own synthetic workspaces. Live provider checks consume provider quota; they report actual failures instead of fixtures. Screenshots, PDF exports and sanitized machine-readable evidence live under `output/`. [Verification](docs/verification.md), [completion report](docs/completion.md) and [review cycle](reviews/PRODUCT-CYCLE.md) distinguish implementation, execution and external blockers.
+`FOLIO_TEST_DATABASE_URL` enables actual database tests; keep that URI in local process configuration. `verify:persistence` starts temporary production app processes on3103 and cleans up its own synthetic workspaces. Live provider checks consume provider quota; they report actual failures instead of fixtures. Screenshots, PDF exports and sanitized machine-readable evidence live under `output/`. [Verification](docs/verification.md), [completion report](docs/completion.md), [verified evidence](docs/evidence.md) and [review cycle](reviews/PRODUCT-CYCLE.md) distinguish implementation, execution and external blockers.
 
 With a Nessie key only: `npm run nessie:setup -- --apply` finds/creates the dedicated synthetic customer and saves its ID locally. `npm run nessie:seed` previews writes; `-- --apply` creates marked resources idempotently. `FOLIO_PUBLIC_SANDBOX=true` explicitly allows isolated public sessions to read that dedicated mock customer; it never enables arbitrary customer selection or private uploads. Default is false.
 

@@ -10,8 +10,9 @@ Exactly two development roles: Codex builder/coordinator and one Claude Code rev
 |6e11f432494412aa44301ff267358a8349912b98| TLS guard-test gaps and silent primary pin mismatch repaired. Actual cloud migration/restart code inspected. |
 |a69c024826d3fba86f44add01daecf0cc837b960| Prior findings confirmed fixed; authorized AI IDs, partial-evidence wording, bounded output and safe error cause confirmed; no new actionable scoped defects. |
 |7074ddbf00b7dce9fc6de94068a37b7611516940| Body-abort/unreadable-JSON fix and fixture-only provider review confirmed; final cleanup flag completion checked separately. |
+|8cc031f85ea5fbda5abc86dacf376cb7d32b4db1| Cleanup active=false before abort confirmed; no new scoped defects or credentials in tracked docs. |
 
-Execution against the configured Tiger Cloud database: **44/44 unit/API/database checks**, no skips; **14/14 desktop/mobile full journeys** on7074ddb after the body-abort fix. Final cleanup-only change has a separate targeted two-viewport profile-switch check. Lint, typecheck and production build pass. Reports/logs are local under output/verification and .workflow; manifest records current source revision and artifact hashes.
+Execution against the configured Tiger Cloud database: **44/44 unit/API/database checks** with actual Tiger Cloud tests enabled, no skips; **14/14 desktop/mobile full journeys** on7074ddb after the body-abort fix. Final cleanup-only change passes its separate targeted two-viewport profile-switch check2/2 at8cc031f85ea5fbda5abc86dacf376cb7d32b4db1. Lint, typecheck and production build pass. Reports/logs are local under output/verification and .workflow; manifest records current source revision and artifact hashes.
 
 Cloud cutover preserved221 workspaces,10710 financial rows,235 assessments,61 shares,214 sessions and audit/source history. Two actual production app restarts retained correction71→70, USD5050000→5040000 income, earlier immutable passport, sessions and revoked JSON/PDF denial; another session could not access the owner's passport/share actions. Source PostgreSQL and original SQLite/iCloud repository were preserved.
 
