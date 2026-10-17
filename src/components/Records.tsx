@@ -188,7 +188,9 @@ export function Records({
                     <div className="suggestion">
                       <small>
                         Suggested: {r.suggestion.category} ·{" "}
-                        {r.suggestion.reason}
+                        {r.suggestion.reason === "manual-review-source-text"
+                          ? "This source text may contain instructions. Inspect the original evidence and choose a category manually."
+                          : r.suggestion.reason}
                       </small>
                       <button
                         disabled={Boolean(busy)}

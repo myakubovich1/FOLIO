@@ -87,6 +87,18 @@ export async function structured<T>(
       verify?.(value);
       return value;
     } catch (e) {
+      const status = Number(
+        (e as { statusCode?: number; status?: number })?.statusCode ||
+          (e as { status?: number })?.status,
+      );
+      if (status === 429)
+        throw new ProviderUnavailable(
+          "Gemini's provider allowance is currently exhausted. Use the calculated explanation or manual review; retry when provider quota resets or the operator configures an available model/tier.",
+        );
+      if (status === 404)
+        throw new ProviderUnavailable(
+          "The configured Gemini model is unavailable. Calculated explanations and manual review remain available while the operator updates the model configuration.",
+        );
       last = e;
       if (attempt === 1) break;
     }
@@ -307,7 +319,7 @@ export function previewExtraction(
   return preview;
 }
 export const instructionLikeSource = (description: string) =>
-  /\b(ignore|instructions?|classify|approve|system|prompt|assistant|override)\b/i.test(
+  /\b(ignore|instructions?|prompt|assistant|override)\b|\b(system\s+prompt|classify\s+as|approve\s+(?:my|the|a)?\s*loan)\b/i.test(
     description,
   );
 export async function suggestClassifications(s: State) {
@@ -320,7 +332,7 @@ export async function suggestClassifications(s: State) {
       id: r.id,
       category: "unknown" as const,
       evidence: [r.id],
-      reason: "insufficient-evidence",
+      reason: "manual-review-source-text",
     }));
   const eligible = rows.filter((r) => !instructionLikeSource(r.description));
   if (!eligible.length) return held;

@@ -28,7 +28,8 @@
     "db:seed": "tsx scripts/seed.ts",
     "nessie:setup": "tsx scripts/setup-nessie.ts",
     "providers:smoke": "tsx scripts/provider-smoke.ts",
-    "db:transfer": "tsx scripts/transfer.ts"
+    "db:transfer": "tsx scripts/transfer.ts",
+    "verify:persistence": "tsx scripts/check-persistence.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",

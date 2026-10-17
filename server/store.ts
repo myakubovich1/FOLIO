@@ -1,5 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
-import { Pool, type PoolClient } from "pg";
+import { type Pool, type PoolClient } from "pg";
+import { databasePool } from "./database.js";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import type { State, Passport } from "../src/contracts.js";
@@ -15,13 +16,7 @@ export class Store {
   private pending: Promise<unknown> = Promise.resolve();
   private cleanupTimer?: ReturnType<typeof setInterval>;
   constructor(path = ":memory:", url?: string) {
-    this.pool = url
-      ? new Pool({
-          connectionString: url,
-          max: 5,
-          connectionTimeoutMillis: 10000,
-        })
-      : null;
+    this.pool = url ? databasePool(url) : null;
     this.db = url ? null : new DatabaseSync(path);
   }
   async query(sql: string, params: unknown[] = []): Promise<Row[]> {

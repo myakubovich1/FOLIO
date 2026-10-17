@@ -19,6 +19,7 @@ test(
     await source.init();
     let target = new Store(":memory:", process.env.FOLIO_TEST_DATABASE_URL);
     await target.init();
+    const blocked = `transfer:${randomUUID()}`;
     const owner = `transfer:${randomUUID()}`,
       other = `transfer:${randomUUID()}`,
       session = randomUUID(),
@@ -59,11 +60,22 @@ test(
             isRevoked,
           ],
         );
+      await source.create(blocked, demoState("limited"));
+      await target.query(
+        "INSERT INTO folio_tombstones(owner,complete) VALUES($1,1)",
+        [blocked],
+      );
       const data: TransferSnapshot = {};
       for (const t of sourceTables)
         data[t] = await source.query(`SELECT * FROM ${t}`);
       const result = await transferSnapshot(target.pool!, data);
       assert.equal(result.ownersCopied, 2);
+      assert.equal(result.skipped.destinationDeletionGuard, 1);
+      assert.equal(
+        await target.get(blocked),
+        undefined,
+        "destination deletion must not be undone by stale source history",
+      );
       assert.equal(
         (await transferSnapshot(target.pool!, data)).ownersCopied,
         0,

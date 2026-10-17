@@ -60,6 +60,17 @@ export async function transferSnapshot(
         )
         .map((r) => r.id),
     );
+    const skipped = {
+      existingDestination: snapshot.folio_owners.filter((r) =>
+        existing.has(r.id),
+      ).length,
+      destinationDeletionGuard: snapshot.folio_owners.filter((r) =>
+        deleted.has(r.id),
+      ).length,
+      sourceDeletionGuard: snapshot.folio_owners.filter((r) =>
+        sourceDeleted.has(r.id),
+      ).length,
+    };
     const counts: Record<string, number> = {};
     for (const [table, definition] of Object.entries(transferTables)) {
       const columns = definition
@@ -105,6 +116,7 @@ export async function transferSnapshot(
     }
     await client.query("COMMIT");
     return {
+      skipped,
       ownersCopied: accepted.size,
       ownersSkipped: snapshot.folio_owners.length - accepted.size,
       rows: counts,

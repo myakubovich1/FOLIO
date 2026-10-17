@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { demoState } from "../server/workspace.js";
 import { assess } from "../server/assessment.js";
 import {
+  PROMPT_VERSION,
   deterministicExplanation,
   validateClaims,
 } from "../server/explanations.js";
@@ -17,6 +18,12 @@ const cases = JSON.parse(readFileSync("evals/cases.json", "utf8")) as {
     income: number;
     expenses: number;
   }[];
+  questions: {
+    profile: string;
+    question: string;
+    required: string[];
+    forbidden: string[];
+  }[];
   classification: {
     id: string;
     description: string;
@@ -25,6 +32,7 @@ const cases = JSON.parse(readFileSync("evals/cases.json", "utf8")) as {
   }[];
 };
 const results = [];
+const questions = [];
 const live = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL);
 for (const expected of cases.profiles) {
   const s = demoState(expected.id);
@@ -97,15 +105,46 @@ if (live) {
     };
   }
 }
+if (live)
+  for (const expected of cases.questions) {
+    const s = demoState(expected.profile);
+    s.connected = true;
+    s.assessment = assess(s.borrower, s.revision);
+    try {
+      const e = await geminiExplanation(s, expected.question);
+      const text = e.paragraphs.map((p) => p.text).join(" ");
+      const missing = expected.required.filter((x) => !text.includes(x));
+      const forbidden = expected.forbidden.filter((x) =>
+        text.toLowerCase().includes(x.toLowerCase()),
+      );
+      questions.push({
+        profile: expected.profile,
+        question: expected.question,
+        passed: !missing.length && !forbidden.length,
+        missingRequired: missing,
+        unsupportedClaims: forbidden,
+        revision: e.revision,
+        promptVersion: e.promptVersion,
+      });
+    } catch {
+      questions.push({
+        profile: expected.profile,
+        question: expected.question,
+        passed: false,
+        error: "Provider or evidence validation failure",
+      });
+    }
+  }
 const report = {
   at: new Date().toISOString(),
   version: cases.version,
   model: process.env.GEMINI_MODEL || null,
-  promptVersion: "folio-evidence-v1",
+  promptVersion: PROMPT_VERSION,
   scope:
     "Synthetic human-authored expectations; no repayment or real-world extraction accuracy claim",
   results,
   classifications,
+  questions,
   extraction: {
     accuracy: null,
     status:

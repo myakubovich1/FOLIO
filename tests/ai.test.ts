@@ -159,7 +159,10 @@ test("unsupported numerical claims and incompatible classification evidence are 
 });
 
 test("instruction-like source keywords cannot support a classification", async () => {
-  const { validateSuggestions } = await import("../server/gemini.js");
+  const { validateSuggestions, instructionLikeSource } =
+    await import("../server/gemini.js");
+  assert.equal(instructionLikeSource("SEPA system payment"), false);
+  assert.equal(instructionLikeSource("auto-classified deposit"), false);
   const rows = [
     {
       id: "instruction",
