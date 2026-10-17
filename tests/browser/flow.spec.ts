@@ -319,21 +319,29 @@ test("analytics mismatch, unavailable and empty responses retain the matching as
   await expect(
     page.getByText(/Analytics does not match this assessment revision/),
   ).toBeVisible();
-  await expect(page.locator(".month-inspector")).toContainText("$4,300");
+  const expected = (await (await page.request.get("/api/state")).json())
+    .assessment;
+  const income = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: expected.currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(expected.monthly[0].income / 100);
+  await expect(page.locator(".month-inspector")).toContainText(income);
   await expect(
     page.getByText(/Calculated from the current reviewed records/),
   ).toBeVisible();
   await expect(
     page.getByText("Unmatched analytics fixture", { exact: true }),
   ).toHaveCount(0);
-  await page.getByRole("button", { name: "Retry analytics" }).click();
+  await page.getByRole("button", { name: "Refresh assessment" }).click();
   await expect(page.getByText(/Analytics is unavailable/)).toBeVisible();
   await page.getByRole("button", { name: "Retry analytics" }).click();
   await expect(
     page.getByText(/Analytics does not match this assessment revision/),
   ).toBeVisible();
   await expect(page.locator(".plot-month")).toHaveCount(12);
-  await page.getByRole("button", { name: "Retry analytics" }).click();
+  await page.getByRole("button", { name: "Refresh assessment" }).click();
   await expect(page.getByText(/Matching analytics fixture/)).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Retry analytics" }),

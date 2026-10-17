@@ -125,6 +125,7 @@ function Evidence({
 }
 function Cashflow({ assessment }: { assessment: Assessment }) {
   const [retryAttempt, setRetryAttempt] = useState(0);
+  const [mismatch, setMismatch] = useState(false);
   const [rows, setRows] = useState(assessment.monthly),
     [source, setSource] = useState(
       "Calculated from the current reviewed records",
@@ -134,6 +135,7 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
     const controller = new AbortController();
     setRows(assessment.monthly);
     setSource("Calculated from the current reviewed records");
+    setMismatch(false);
     setError("");
     api<{ backend: string; rows: Assessment["monthly"] }>(
       "cashflow",
@@ -155,8 +157,9 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
             );
           });
         if (!matches) {
+          setMismatch(true);
           setError(
-            "Analytics does not match this assessment revision. Showing the current deterministic summary; reload to refresh your assessment.",
+            "Analytics does not match this assessment revision. Showing the current deterministic summary. Refresh your assessment before loading newer analytics.",
           );
           return;
         }
@@ -188,9 +191,11 @@ function Cashflow({ assessment }: { assessment: Assessment }) {
           {error}
           <button
             className="quiet"
-            onClick={() => setRetryAttempt((n) => n + 1)}
+            onClick={() =>
+              mismatch ? location.reload() : setRetryAttempt((n) => n + 1)
+            }
           >
-            Retry analytics
+            {mismatch ? "Refresh assessment" : "Retry analytics"}
           </button>
         </div>
       )}
