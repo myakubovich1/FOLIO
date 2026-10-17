@@ -2,6 +2,12 @@
 
 **Credit beyond your credit history.** Permissioned financial records → review and correction → deterministic alternative assessment → portable financial passport → expiring sharing and revocation. An existing credit score is not required. This experimental scorecard is not a lending decision, repayment prediction, or promise of lender acceptance.
 
+![FOLIO borrower journey: bring records, review interpretation, understand and share](docs/images/borrower-journey.png)
+
+[Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png)
+
+Screenshots use explicitly synthetic demo records.
+
 ## Visual experience
 
 Original SVG journey illustrations, an assessment index ring, labelled factor bars, and a keyboard/touch cash-flow inspector make the borrower story visible. Graphics use the existing deterministic metrics, separate missing evidence from zero, and preserve passport disclosure choices. See the [graphics checkpoint](docs/checkpoint-graphics.md) for screenshots and independent Opus 5.5 review evidence.
@@ -21,7 +27,8 @@ Active workspace: `/Users/myakubovich/Projects/FOLIO`. The original iCloud Docum
 Node22.17+ is required. Next.js App Router and Express share a server; database access, provider keys and score math stay on the server.
 
 ```sh
-cd /Users/myakubovich/Projects/FOLIO
+gh repo clone myakubovich1/FOLIO
+cd FOLIO
 npm ci
 # Only on a fresh checkout: copy .env.example to .env.local if absent.
 # Enter credentials in the ignored local file, never chat or Git.
