@@ -1,4 +1,4 @@
-type IconName =
+export type IconName =
   | "overview"
   | "records"
   | "report"
@@ -64,6 +64,7 @@ export function Icon({ name }: { name: IconName }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      focusable="false"
     >
       {paths[name]}
     </svg>

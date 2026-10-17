@@ -3,12 +3,13 @@ import type { State, Assessment, Passport } from "./contracts";
 import { api, money, displayDate } from "./api";
 import { Logo } from "./components/Logo";
 import { Icon } from "./components/Icon";
-import {
-  IndexVisual,
-  JourneyArt,
-  FactorGlyph,
-} from "./components/Infographics";
+import { IndexVisual, FactorGlyph } from "./components/Infographics";
 import { CashflowPlot } from "./components/CashflowPlot";
+import {
+  JourneyExplorer,
+  EvidenceFlow,
+  NextStep,
+} from "./components/WorkflowViews";
 import { Report } from "./components/Report";
 import { Sources } from "./components/Sources";
 import { Records } from "./components/Records";
@@ -402,47 +403,11 @@ function Landing({
           </p>
         </div>
       </main>
-      <section className="marketing-section" id="how-it-works">
-        <div className="eyebrow">A FINANCIAL RECORD THAT MAKES SENSE</div>
-        <h2>
-          From activity to understanding.
-          <br />
-          In a few clear steps.
-        </h2>
-        <div className="steps-grid">
-          {[
-            [
-              "01",
-              "records",
-              "Bring your records",
-              "Use permissioned statements or a clearly labeled simulation. See source scope before processing.",
-            ],
-            [
-              "02",
-              "review",
-              "Review what they mean",
-              "Check income, transfers and expenses. Correct an interpretation without rewriting the source.",
-            ],
-            [
-              "03",
-              "passport",
-              "Understand and share",
-              "Inspect the calculation, then issue a limited passport with an expiring, revocable link.",
-            ],
-          ].map(([n, kind, title, copy]) => (
-            <article
-              className={`illustrated-step illustrated-step-${kind}`}
-              key={n}
-            >
-              <div className="journey-art">
-                <JourneyArt kind={kind as "records" | "review" | "passport"} />
-                <span className="art-step-number">{n}</span>
-              </div>
-              <h3>{title}</h3>
-              <p>{copy}</p>
-            </article>
-          ))}
-        </div>
+      <section
+        className="marketing-section interactive-journey"
+        id="how-it-works"
+      >
+        <JourneyExplorer onStart={onStart} busy={busy} />
       </section>
       <section className="audience-section marketing-section">
         <div>
@@ -1035,6 +1000,20 @@ function App() {
             {["Overview", "Assessment"].includes(page) &&
               (state.assessment ? (
                 <>
+                  {page === "Overview" && (
+                    <NextStep
+                      state={state}
+                      onRecords={() => setPage("Records")}
+                      onReport={() => setPage("Report")}
+                    />
+                  )}
+                  {page === "Assessment" && (
+                    <EvidenceFlow
+                      state={state}
+                      onRecords={() => setPage("Records")}
+                      onReport={() => setPage("Report")}
+                    />
+                  )}
                   <AssessmentView
                     state={state}
                     detail={page === "Assessment"}

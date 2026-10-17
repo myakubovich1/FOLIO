@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { State, Passport } from "../contracts";
 import { api, displayDate } from "../api";
 import { Report } from "./Report";
+import { SharingFlow } from "./WorkflowViews";
 export function PassportBuilder({
   state,
   onState,
@@ -9,6 +10,12 @@ export function PassportBuilder({
   state: State;
   onState: (s: State) => void;
 }) {
+  const previewRef = useRef<HTMLDetailsElement>(null);
+  const previewSummaryRef = useRef<HTMLElement>(null);
+  const [copyMessage, setCopyMessage] = useState<{
+    shareId: string;
+    text: string;
+  } | null>(null);
   const [previewAttempt, setPreviewAttempt] = useState(0);
   const [factors, setFactors] = useState(true),
     [cashflow, setCashflow] = useState(true),
@@ -29,9 +36,12 @@ export function PassportBuilder({
       { disclosure: { factors, cashflow } },
       controller.signal,
     )
-      .then(setPreview)
+      .then((value) => {
+        if (!controller.signal.aborted) setPreview(value);
+      })
       .catch((e) => {
-        if (e.name !== "AbortError") setError(e.message);
+        if (!controller.signal.aborted && e.name !== "AbortError")
+          setError(e.message);
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
@@ -64,6 +74,7 @@ export function PassportBuilder({
             <input
               type="checkbox"
               checked={factors}
+              disabled={busy}
               onChange={(e) => setFactors(e.target.checked)}
             />
             Include factor contributions
@@ -72,6 +83,7 @@ export function PassportBuilder({
             <input
               type="checkbox"
               checked={cashflow}
+              disabled={busy}
               onChange={(e) => setCashflow(e.target.checked)}
             />
             Include cash-flow totals
@@ -110,6 +122,7 @@ export function PassportBuilder({
         <label htmlFor="share-days">New link lifetime</label>
         <select
           id="share-days"
+          disabled={busy}
           value={days}
           onChange={(e) => setDays(Number(e.target.value))}
         >
@@ -123,6 +136,25 @@ export function PassportBuilder({
           someone already downloaded.
         </p>
       </section>
+      <details className="card sharing-flow">
+        <summary>Explore the sharing flow</summary>
+        <SharingFlow
+          state={state}
+          factors={factors}
+          cashflow={cashflow}
+          days={days}
+          previewState={loading ? "loading" : preview ? "ready" : "unavailable"}
+          onPreview={() => {
+            if (!previewRef.current || !previewSummaryRef.current) return;
+            previewRef.current.open = true;
+            previewSummaryRef.current.focus({ preventScroll: true });
+            previewSummaryRef.current.scrollIntoView({
+              block: "start",
+              behavior: "auto",
+            });
+          }}
+        />
+      </details>
       {loading ? (
         <section className="card skeleton" role="status">
           Preparing your recipient preview…
@@ -130,10 +162,11 @@ export function PassportBuilder({
       ) : (
         preview && (
           <details
+            ref={previewRef}
             className="recipient-preview"
             open={state.passports.length === 0}
           >
-            <summary>
+            <summary ref={previewSummaryRef}>
               Recipient preview · current revision {state.revision}
             </summary>
             <Report passport={preview} />
@@ -172,6 +205,7 @@ export function PassportBuilder({
                     { passportId: p.id, days },
                   );
                   onState(r.state);
+                  setCopyMessage(null);
                   setUrls((old) => ({
                     ...old,
                     [r.state.shares[0].id]:
@@ -200,17 +234,55 @@ export function PassportBuilder({
                 <small>
                   Link {s.id.slice(0, 6)} · expires {displayDate(s.expiresAt)}
                 </small>
-                {s.revoked ? (
-                  <p>Revoked</p>
+                {s.revoked || !(Date.parse(s.expiresAt) > Date.now()) ? (
+                  <p>{s.revoked ? "Revoked" : "Expired or unavailable"}</p>
                 ) : (
-                  <a
-                    className="text-link"
-                    href={urls[s.id]}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Open recipient preview ↗
-                  </a>
+                  <div className="share-link-actions">
+                    <button
+                      className="secondary"
+                      onClick={async () => {
+                        if (!(Date.parse(s.expiresAt) > Date.now())) {
+                          setCopyMessage({
+                            shareId: s.id,
+                            text: "This link has expired. Create a new link.",
+                          });
+                          return;
+                        }
+                        try {
+                          await navigator.clipboard.writeText(urls[s.id]);
+                          setCopyMessage({
+                            shareId: s.id,
+                            text: "Link copied. Share it only with the intended recipient.",
+                          });
+                        } catch {
+                          const input = document.getElementById(
+                            `share-${s.id}`,
+                          ) as HTMLInputElement | null;
+                          input?.focus();
+                          input?.select();
+                          setCopyMessage({
+                            shareId: s.id,
+                            text: "Automatic copy is unavailable. The link is selected; copy it manually.",
+                          });
+                        }
+                      }}
+                    >
+                      Copy passport link
+                    </button>
+                    <a
+                      className="text-link"
+                      href={urls[s.id]}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open recipient preview ↗
+                    </a>
+                  </div>
+                )}
+                {copyMessage?.shareId === s.id && (
+                  <p className="fine" role="status">
+                    {copyMessage.text}
+                  </p>
                 )}
               </section>
             ))}
