@@ -31,9 +31,9 @@ const paths: Record<IconName, React.ReactNode> = {
   ),
   settings: (
     <>
-      <path d="M4 7h16M4 17h16" />
-      <circle cx="9" cy="7" r="3" fill="var(--white)" />
-      <circle cx="15" cy="17" r="3" fill="var(--white)" />
+      <path d="M4 7h2m6 0h8M4 17h8m6 0h2" />
+      <circle cx="9" cy="7" r="3" />
+      <circle cx="15" cy="17" r="3" />
     </>
   ),
   arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
