@@ -25,7 +25,7 @@ prompt="$snapshot/review-prompt.txt"
  if [[ -n "${2:-}" ]]; then printf '\nThis is a focused follow-up to your completed review. Verify the prior findings and the specific repair/new-change scope supplied in Checkpoint focus above. Do not repeat the full requirements review. Return at most five actionable findings, or confirm the scoped repairs by source inspection. Keep the response concise; no test execution is available.\n'; fi
 } > "$prompt"
 out="$PWD/reviews/$commit.json"
-claude_args=(-p --permission-mode dontAsk --tools Read,Glob,Grep --allowedTools Read,Glob,Grep --disallowedTools Bash,Edit,Write,Agent,Task,NotebookEdit --disable-slash-commands --setting-sources '' --strict-mcp-config --mcp-config "$snapshot/empty-mcp.json" --settings '{"disableAllHooks":true}' --output-format json)
+claude_args=(-p --effort "${FOLIO_REVIEW_EFFORT:-low}" --permission-mode dontAsk --tools Read,Glob,Grep --allowedTools Read,Glob,Grep --disallowedTools Bash,Edit,Write,Agent,Task,NotebookEdit --disable-slash-commands --setting-sources '' --strict-mcp-config --mcp-config "$snapshot/empty-mcp.json" --settings '{"disableAllHooks":true}' --output-format json)
 session_cwd="$snapshot"
 if [[ -n "${2:-}" ]]; then
   if [[ ! "$2" =~ ^[a-f0-9-]{36}$ ]] || [[ ! -f "$root/.workflow/sessions/$2.cwd" ]]; then echo 'No saved reviewer directory for that session. Run a fresh review without the session ID.' >&2; exit 1; fi

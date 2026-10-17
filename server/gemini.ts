@@ -73,7 +73,11 @@ export async function structured<T>(
                   })),
                 ],
           system_instruction: system,
-          generation_config: { temperature: 0 },
+          generation_config: {
+            temperature: 0,
+            thinking_level: "low",
+            max_output_tokens: typeof contents === "string" ? 4096 : 16384,
+          },
           response_format: {
             type: "text",
             mime_type: "application/json",
@@ -106,6 +110,7 @@ export async function structured<T>(
   void last;
   throw new ProviderUnavailable(
     "Gemini could not return a valid result. Your records are unchanged. Check model access or quota, then retry.",
+    { cause: last },
   );
 }
 export const explanationEnvelope = z
@@ -336,11 +341,14 @@ export async function suggestClassifications(s: State) {
     }));
   const eligible = rows.filter((r) => !instructionLikeSource(r.description));
   if (!eligible.length) return held;
+  const authorizedId = z.enum(
+    eligible.map((r) => r.id) as [string, ...string[]],
+  );
   const schema = z.object({
     suggestions: z
       .array(
         z.object({
-          id: z.string(),
+          id: authorizedId,
           category: z.enum([
             "income",
             "expense",
@@ -349,7 +357,13 @@ export async function suggestClassifications(s: State) {
             "refund",
             "unknown",
           ]),
-          evidence: z.array(z.string()).min(1).max(3),
+          evidence: z
+            .array(authorizedId)
+            .min(1)
+            .max(3)
+            .describe(
+              "Include the target record ID itself; only supplied IDs are valid evidence.",
+            ),
           reason: z.enum([
             "explicit-income",
             "explicit-expense",

@@ -198,3 +198,14 @@ test("instruction-like source keywords cannot support a classification", async (
     "unknown",
   );
 });
+
+test("partial records never describe missing costs as confirmed disposable income", () => {
+  const s = demoState("limited");
+  s.assessment = assess(s.borrower, 1);
+  const explanation = deterministicExplanation(s, "cash flow");
+  assert.ok(
+    explanation.paragraphs.some((p) =>
+      p.text.includes("Missing or unclassified costs are not zero expenses"),
+    ),
+  );
+});

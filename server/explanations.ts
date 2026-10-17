@@ -1,5 +1,5 @@
 import type { State, Explanation } from "../src/contracts.js";
-export const PROMPT_VERSION = "folio-evidence-v2";
+export const PROMPT_VERSION = "folio-evidence-v3";
 export const kinds = [
   "cashflow",
   "factors",
@@ -66,7 +66,7 @@ export function paragraph(s: State, kind: ClaimKind) {
   switch (kind) {
     case "cashflow":
       return {
-        text: `The records show ${money(a.income, a.currency)} in external income and ${money(a.expenses, a.currency)} in expenses after refunds. The difference is ${money(a.net, a.currency)} over the observed period.`,
+        text: `The records show ${money(a.income, a.currency)} in external income and ${money(a.expenses, a.currency)} in expenses after refunds. The recorded difference is ${money(a.net, a.currency)} over the observed period.${a.score === null ? " Missing or unclassified costs are not zero expenses; this difference is not confirmed disposable income." : ""}`,
         evidence: records
           .filter((r) => ["income", "expense", "refund"].includes(r.category))
           .slice(0, 12)

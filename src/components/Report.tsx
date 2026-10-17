@@ -46,6 +46,13 @@ export function Report({ passport: p }: { passport: Passport }) {
           </div>
         </div>
       )}
+      {a.score === null && p.disclosure?.cashflow !== false && (
+        <p className="caution">
+          Totals describe reviewed records only. Missing or unclassified costs
+          are not zero expenses; the difference is not confirmed disposable
+          income.
+        </p>
+      )}
       {a.factors.length > 0 && (
         <section>
           <h3>What contributes to the index</h3>

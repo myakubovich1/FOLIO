@@ -1199,6 +1199,8 @@ function AssessmentView({
           </div>
         </div>
         <p className="fine">
+          {a.score === null &&
+            "Partial evidence: missing or unclassified costs are not zero expenses. The difference is not confirmed disposable income. "}
           Full observed period. Residual cash flow means income minus recorded
           expenses after refunds; it is not a loan limit. Unrecorded activity
           remains unknown.

@@ -45,17 +45,15 @@ if (process.env.NESSIE_API_KEY && process.env.NESSIE_CUSTOMER_ID) {
         missing: state.assessment.missing,
         currency: state.assessment.currency,
       },
-      trace: state.borrower.records
-        .slice(0, 3)
-        .map((r) => ({
-          reference: r.sourceLocation,
-          normalizedId: r.id,
-          date: r.date,
-          amount: r.amount,
-          currency: r.currency,
-          category: r.category,
-          status: r.status,
-        })),
+      trace: state.borrower.records.slice(0, 3).map((r) => ({
+        reference: r.sourceLocation,
+        normalizedId: r.id,
+        date: r.date,
+        amount: r.amount,
+        currency: r.currency,
+        category: r.category,
+        status: r.status,
+      })),
       note: "Unknown deposits require human purpose confirmation; no full statement/balance history is invented.",
     };
   } catch {
@@ -74,7 +72,7 @@ if (process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL) {
   try {
     const explanation = await geminiExplanation(
       state,
-      "Explain the current result, missing information and conditional improvement opportunities.",
+      "Explain the observed income and missing records. Can this prove loan approval?",
     );
     state.explanation = explanation;
     report.gemini = {

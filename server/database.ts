@@ -25,6 +25,14 @@ export function databasePool(connectionString: string, max = 5) {
     throw Error(
       "Database certificate pin requires its explicit service host and port.",
     );
+  if (
+    pin &&
+    url.host !== pinHost &&
+    connectionString === process.env.DATABASE_URL
+  )
+    throw Error(
+      "The primary database host differs from its configured certificate pin; verify the new service before changing the pin scope.",
+    );
   if (!pin || url.host !== pinHost)
     return new Pool({ connectionString, max, connectionTimeoutMillis: 10000 });
   const root = url.searchParams.get("sslrootcert");

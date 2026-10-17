@@ -149,6 +149,10 @@ export function passportPdf(p: Passport): Promise<Buffer> {
     d.y = 48;
     heading("How to read this passport");
     paragraph(a.validation);
+    if (a.score === null && p.disclosure?.cashflow !== false)
+      paragraph(
+        "Totals describe reviewed records only. Missing or unclassified costs are not zero expenses; the recorded difference is not confirmed disposable income.",
+      );
     paragraph(
       "The Folio Credit Index is a deterministic 0-100 experimental scorecard, with higher values representing stronger assessed financial capacity under this model. It is not a bureau score, probability of default, loan offer or lending decision. No traditional credit score is required or used. Evidence confidence is separate from the index.",
     );
