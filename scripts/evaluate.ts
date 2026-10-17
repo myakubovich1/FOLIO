@@ -31,10 +31,11 @@ const cases = JSON.parse(readFileSync("evals/cases.json", "utf8")) as {
     acceptable: Category[];
   }[];
 };
+const classificationOnly = process.argv.includes("--classification-only");
 const results = [];
 const questions = [];
 const live = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL);
-for (const expected of cases.profiles) {
+for (const expected of classificationOnly ? [] : cases.profiles) {
   const s = demoState(expected.id);
   s.connected = true;
   s.assessment = assess(s.borrower, 1);
@@ -105,7 +106,7 @@ if (live) {
     };
   }
 }
-if (live)
+if (live && !classificationOnly)
   for (const expected of cases.questions) {
     const s = demoState(expected.profile);
     s.connected = true;
@@ -140,8 +141,9 @@ const report = {
   version: cases.version,
   model: process.env.GEMINI_MODEL || null,
   promptVersion: PROMPT_VERSION,
-  scope:
-    "Synthetic human-authored expectations; no repayment or real-world extraction accuracy claim",
+  scope: classificationOnly
+    ? "Classification-only synthetic evaluation; no profile/question checks in this run"
+    : "Synthetic human-authored expectations; no repayment or real-world extraction accuracy claim",
   results,
   classifications,
   questions,
@@ -153,7 +155,9 @@ const report = {
 };
 mkdirSync("output/verification", { recursive: true });
 writeFileSync(
-  "output/verification/ai-evaluation.json",
+  classificationOnly
+    ? "output/verification/ai-classification.json"
+    : "output/verification/ai-evaluation.json",
   JSON.stringify(report, null, 2),
 );
 console.log(JSON.stringify(report, null, 2));

@@ -52,7 +52,7 @@ try {
       {
         at: new Date().toISOString(),
         scope:
-          "Local actual PostgreSQL/Timescale, API-equivalent refresh plus monthly aggregate; sequential warm requests; no concurrency/load claim",
+          `${["localhost","127.0.0.1"].includes(new URL(db).hostname) ? "Local PostgreSQL/Timescale" : "Configured network Tiger Cloud/PostgreSQL"}; API-equivalent refresh plus monthly aggregate; sequential warm requests; no concurrency/load claim`,
         results,
       },
       null,

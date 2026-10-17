@@ -37,6 +37,7 @@ For local Timescale: `docker compose up -d`; use the development URI from docker
 npm run typecheck
 npm run lint
 npm test
+npm run test:database # configured DATABASE_URL, synthetic test owners only
 npm run build
 npm run test:e2e
 npm run providers:check

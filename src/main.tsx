@@ -246,7 +246,10 @@ function Landing({
             "This preview could not load. You can still open the demo and retry.",
           );
       });
-    return () => controller.abort();
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [selected]);
   return (
     <>

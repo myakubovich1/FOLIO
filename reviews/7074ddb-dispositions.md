@@ -1,0 +1,5 @@
+# Review disposition — 7074ddbf00b7dce9fc6de94068a37b7611516940
+
+Claude confirmed the response-body AbortError/unreadable-JSON repair, profile-result guard intent and exact synthetic-fixture review in provider-smoke. No actionable finding was reported. Codex's lint subsequently caught that Landing's cleanup still needed to set active=false; that one-line completion is included in the final source checkpoint and gets a targeted profile-switch recheck. The response-body abort regression itself already passed the direct test and full14 browser suite.
+
+Actual provider smoke is now successful end to end: real six-movement Nessie ingest, explicitly marked seed-deposit review, USD1260000 recorded income while score remains null, Gemini explanation,2/2-row PDF extraction and Tiger Cloud persistence/PDF. Full current live AI evaluation passes five profile answers, four classifications and three question cases under gemini-3.1-flash-lite / folio-evidence-v3. Earlier failure/quota runs remain documented; these are small synthetic checks, not general accuracy estimates.
