@@ -64,11 +64,9 @@ test(
       } finally {
         await replica.close();
       }
-      const originalQuery = store.query.bind(store);
-      store.query = async (sql, params) => {
-        if (sql.startsWith("CALL refresh_continuous_aggregate"))
-          throw Error("simulated maintenance");
-        return originalQuery(sql, params);
+      const originalRefresh = store.refreshAggregate.bind(store);
+      store.refreshAggregate = async () => {
+        throw Error("simulated maintenance");
       };
       try {
         assert.equal((await store.delete(owner)).cleanupPending, true);
@@ -78,7 +76,7 @@ test(
           /temporarily unavailable/,
         );
       } finally {
-        store.query = originalQuery;
+        store.refreshAggregate = originalRefresh;
       }
       const empty = demoState("newcomer");
       empty.borrower.records = [];

@@ -64,8 +64,12 @@ export function Records({
             needs attention.
           </p>
         </div>
-        <button className="primary" onClick={onAssessment}>
-          See assessment →
+        <button
+          className="primary"
+          disabled={Boolean(busy)}
+          onClick={onAssessment}
+        >
+          {busy ? "Saving correction…" : "See assessment →"}
         </button>
       </div>
       {notice && (

@@ -142,9 +142,7 @@ export class Store {
     if (!this.pool) return true;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        await this.query(
-          "CALL refresh_continuous_aggregate('folio_daily_cashflow', NULL::date, NULL::date)",
-        );
+        await this.refreshAggregate();
         return true;
       } catch {
         /* A tombstone continues denying access; never clear it on failed refresh. */
@@ -374,6 +372,50 @@ export class Store {
       return rows.length > 0;
     });
   }
+  // Reserve both allowances in one transaction: a refusal consumes neither.
+  async reserveProviderBudgets(
+    owner: string,
+    provider: string,
+    scope: string,
+    ownerLimit: number,
+    serviceLimit: number,
+    windowMs = 60000,
+  ) {
+    return this.serial(async () => {
+      const client = this.pool ? await this.pool.connect() : undefined;
+      const q: Query = client
+        ? async (sql, p) => (await client.query(sql, p)).rows
+        : (sql, p) => this.query(sql, p);
+      try {
+        await q("BEGIN");
+        const now = Date.now(),
+          cutoff = now - windowMs;
+        const personal = await q(
+          "INSERT INTO folio_provider_limits(owner,scope,window_start,count) SELECT id,$2,$3,1 FROM folio_owners WHERE id=$1 ON CONFLICT(owner,scope) DO UPDATE SET count=CASE WHEN folio_provider_limits.window_start<=$4 THEN 1 ELSE folio_provider_limits.count+1 END,window_start=CASE WHEN folio_provider_limits.window_start<=$5 THEN excluded.window_start ELSE folio_provider_limits.window_start END WHERE folio_provider_limits.window_start<=$6 OR folio_provider_limits.count<$7 RETURNING count",
+          [owner, provider, now, cutoff, cutoff, cutoff, ownerLimit],
+        );
+        if (!personal.length) {
+          await q("ROLLBACK");
+          return false;
+        }
+        const shared = await q(
+          "INSERT INTO folio_service_limits(scope,window_start,count) VALUES($1,$2,1) ON CONFLICT(scope) DO UPDATE SET count=CASE WHEN folio_service_limits.window_start<=$3 THEN 1 ELSE folio_service_limits.count+1 END,window_start=CASE WHEN folio_service_limits.window_start<=$4 THEN excluded.window_start ELSE folio_service_limits.window_start END WHERE folio_service_limits.window_start<=$5 OR folio_service_limits.count<$6 RETURNING count",
+          [scope, now, cutoff, cutoff, cutoff, serviceLimit],
+        );
+        if (!shared.length) {
+          await q("ROLLBACK");
+          return false;
+        }
+        await q("COMMIT");
+        return true;
+      } catch (e) {
+        await q("ROLLBACK").catch(() => {});
+        throw e;
+      } finally {
+        client?.release();
+      }
+    });
+  }
   async cashflow(owner: string) {
     return this.serial(async () => {
       const state = await this.get(owner);
@@ -414,17 +456,47 @@ export class Store {
     });
   }
 
+  // Timescale refuses overlapping refreshes even across distinct owners.
+  // A session advisory lock serializes CALL across application replicas without
+  // wrapping the procedure in a transaction (which Timescale forbids).
+  async refreshAggregate(start?: unknown, end?: unknown) {
+    if (!this.pool) return;
+    const client = await this.pool.connect();
+    let locked = false,
+      discard = false;
+    try {
+      await client.query(
+        "SELECT pg_advisory_lock(hashtextextended('folio-cagg-refresh',0))",
+      );
+      locked = true;
+      if (start)
+        await client.query(
+          "CALL refresh_continuous_aggregate('folio_daily_cashflow', $1::date, $2::date + 1)",
+          [start, end],
+        );
+      else
+        await client.query(
+          "CALL refresh_continuous_aggregate('folio_daily_cashflow', NULL::date, NULL::date)",
+        );
+    } finally {
+      if (locked)
+        try {
+          await client.query(
+            "SELECT pg_advisory_unlock(hashtextextended('folio-cagg-refresh',0))",
+          );
+        } catch {
+          discard = true;
+        }
+      client.release(discard);
+    }
+  }
   async refresh(owner: string) {
     if (!this.pool) return;
     const rows = await this.query(
       "SELECT min(record_date) AS start,max(record_date) AS end FROM folio_transactions WHERE owner=$1",
       [owner],
     );
-    if (rows[0]?.start)
-      await this.query(
-        "CALL refresh_continuous_aggregate('folio_daily_cashflow', $1::date, $2::date + 1)",
-        [rows[0].start, rows[0].end],
-      );
+    if (rows[0]?.start) await this.refreshAggregate(rows[0].start, rows[0].end);
   }
   async delete(owner: string) {
     return this.serial(async () => {

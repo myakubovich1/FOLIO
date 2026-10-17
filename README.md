@@ -1,15 +1,15 @@
 # Folio
 Credit beyond your credit history. An experimental, explainable alternative assessment from permissioned financial activity, with a portable financial passport. No existing credit score required; no lender acceptance or predictive repayment validity is claimed.
 
-## Nessie + Gemini are core product capabilities
+## Nessie, Gemini and Tiger Data are core product capabilities
 
 Nessie performs **actual server-side API reads** of a dedicated synthetic banking customer, normalizes supported resources, persists source references and uses those records in the assessment and passport. Gemini performs **actual server-side generation** for supported explanation claims/citations, PDF extraction and suggested interpretation; financial math stays deterministic. No saved fixture is substituted for a failed live-provider check.
 
-Live execution currently needs keys/customer/model entered in the ignored local `.env.local` (never chat). Run `npm run providers:check` for configuration/discovery, then `npm run providers:smoke` for actual Nessie → normalized records → assessment → persistence/passport and actual Gemini explanation/PDF requests. `npm run eval:ai` records numerical/evidence and configured live classification/explanation checks separately. A model listing or adapter implementation is not a completed live integration.
+This workspace has completed actual Nessie reads, Gemini explanation generation, and a two-row PDF extraction with `gemini-3.8-flash`. Tiger Cloud configuration is being verified; local Timescale persistence and queries are tested. Enter all credentials in the ignored local `.env.local` (never chat). Run `npm run providers:check` for configuration/discovery, then `npm run providers:smoke` for actual Nessie → normalized records → assessment → persistence/passport and actual Gemini explanation/PDF requests. `npm run eval:ai` records numerical/evidence and configured live classification/explanation checks separately. A model listing or adapter implementation is not a completed live integration.
 
 With only a Nessie key, `npm run nessie:setup` shows a plan; `npm run nessie:setup -- --apply` creates/finds a dedicated synthetic customer and saves its ID locally. Run `nessie:seed` to inspect the seed plan, then explicit `--apply` if desired. The optional `FOLIO_PUBLIC_SANDBOX=true` permits isolated public demo sessions to read that shared **synthetic-only** customer without requiring Auth0; private uploads/owner data remain authenticated. It defaults off, and is explicitly on in this local judge-demo workspace.
 
-See the [category checklist](docs/category-checklist.md), [provider/action evidence](docs/sponsor-map.md), [live walkthrough](docs/demo.md), [Devpost draft](docs/devpost-draft.md) and [secret-entry instructions](docs/configuration.md). Target: Nessie, Gemini, AI/ML, UI/UX and Overall, subject to actual eligibility and category rules. Successful external-provider calls remain blocked until configuration is supplied; local Timescale and the service-free synthetic journey are independently testable.
+See the [category checklist](docs/category-checklist.md), [provider/action evidence](docs/sponsor-map.md), [live walkthrough](docs/demo.md), [Devpost draft](docs/devpost-draft.md) and [secret-entry instructions](docs/configuration.md). Target: Nessie, Gemini, Tiger Data, AI/ML, UI/UX and Overall, subject to actual eligibility and category rules. The category checklist separates actual external calls from adapter tests and unresolved external checks.
 
 Active local workspace after iCloud recovery: `/Users/myakubovich/Projects/FOLIO`. The original Documents repository is preserved; see [recovery provenance](docs/recovery.md).
 
@@ -36,6 +36,8 @@ npm run test:e2e # production-mode browser server on port 3101
 
 Optional local TimescaleDB: `docker compose up -d`; then use `DATABASE_URL=postgresql://folio:local-development-only@127.0.0.1:5433/folio npm run db:migrate`. This is a local development password, not a production secret. To run database integration tests, set `FOLIO_TEST_DATABASE_URL` to that local URI when running `npm test`.
 
+Tiger Data persists source history, all assessment revisions and passport/share state. A daily Timescale continuous aggregate powers the borrower cash-flow chart and exact monthly table, with owner/currency filtering and historical correction refresh. See [database cutover and verification](docs/database-transfer.md); `npm run db:transfer` preserves the existing PostgreSQL or SQLite source without overwriting destination owners.
+
 ## Two-agent workflow
 Codex in this chat is the sole builder and coordinator. Claude Code is the sole independent reviewer. Both read docs/project-brief.md and docs/assessment.md; reviewers receive immutable exports of exact Git commits. Continue this chat or, after stopping it, use `npm run builder`.
 
@@ -48,12 +50,12 @@ This machine's API-key balance was exhausted; the process-local override selects
 The initial workflow cycle is recorded in [reviews/CYCLE.md](reviews/CYCLE.md). New product checkpoints include their own reviewed commit and finding dispositions. Only assign Claude independent implementation in a separate `codex/claude-<task>` worktree after defining owned files and acceptance criteria; no parallel worker has been used.
 
 ## Status
-This repository is being completed against the original brief. Adapter implementation, software tests and actual live-provider verification are tracked separately in docs/completion.md. Do not treat a local synthetic demo as production readiness. Auth0 tenant configuration, Tiger Cloud, Nessie and Gemini live smoke checks require external configuration. All fonts are self-hosted through Fontsource and use SIL OFL; SVG identity is original Folio work. AI assistance is disclosed in review and demo documentation.
+This repository is being completed against the original brief. Adapter implementation, software tests and actual live-provider verification are tracked separately in docs/completion.md. Do not treat a local synthetic demo as production readiness. Auth0 tenant login/callback remains pending. Nessie and Gemini have succeeded live; Tiger Cloud TLS and cutover are being validated. All fonts are self-hosted through Fontsource and use SIL OFL; SVG identity is original Folio work. AI assistance is disclosed in review and demo documentation.
 
 ## Product handoff
 
-The full borrower demo now includes record review/correction, inspectable assessment drivers, evidence explanations, conditional scenarios, disclosure previews, two-page PDF export, expiring recipient links, revocation and deletion. All five US/Kenya fixtures remain clearly synthetic. For private uploads and real provider requests, enter the consolidated configuration through the ignored local file; actual Auth0/Nessie/Gemini smoke checks remain external requirements.
+The full borrower demo now includes record review/correction, inspectable assessment drivers, evidence explanations, conditional scenarios, disclosure previews, two-page PDF export, expiring recipient links, revocation and deletion. All five US/Kenya fixtures remain clearly synthetic. For private uploads and real provider requests, enter the consolidated configuration through the ignored local file; private Auth0 login remains an external requirement.
 
-This checkout's `.env.local` uses the running local Timescale database. For a fresh service-free rehearsal, leave DATABASE_URL absent in your own local environment; no external credentials are required. Do not replace an existing environment file. To generate samples/persist fixed seeds: `npm run db:seed`. To rehearse a production build: `npm run build && npm start`.
+This checkout's `.env.local` now contains the supplied Tiger Cloud URI; cloud verification is tracked separately from local Timescale tests. For a fresh service-free rehearsal, leave DATABASE_URL absent in your own local environment; no external credentials are required. Do not replace an existing environment file. To generate samples/persist fixed seeds: `npm run db:seed`. To rehearse a production build: `npm run build && npm start`.
 
 Documentation: [requirement completion](docs/completion.md), [architecture](docs/architecture.md), [imports](docs/imports.md), [evaluation](docs/evaluation.md), [visual specification](docs/visual-spec.md), [verification](docs/verification.md), [deployment/runbook](docs/deployment.md), [demo scripts](docs/demo.md), [actual sponsor map and credits](docs/sponsor-map.md). `npm run providers:check`, `npm run eval:ai` and `npm run db:benchmark` produce ignored inspectable evidence under output/verification. Browser screenshots are under output/screenshots and test-results; sample PDF is output/pdf/folio-demo-passport.pdf.

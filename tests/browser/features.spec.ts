@@ -61,19 +61,34 @@ test("private owner upload, correction, explanation, disclosure, PDF and deletio
   await expect(
     page.getByText(/Calculated explanation · no AI request/),
   ).toBeVisible();
-  await page
+  const proofButton = page
     .getByRole("button", { name: /Inspect \d+ supporting references/ })
-    .first()
-    .click();
+    .first();
+  await proofButton.click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(proofButton).toBeFocused();
   await page.getByLabel(/Add to closing liquid balance/).fill("1000.25");
   await page.getByRole("button", { name: "Calculate scenario" }).click();
   await expect(page.locator(".scenario-result")).toContainText(
     "Conditional model result",
   );
+  await page.route("**/api/passports/preview", (r) =>
+    r.fulfill({
+      status: 503,
+      json: { error: "Recipient preview temporarily unavailable." },
+    }),
+  );
   await page.getByRole("button", { name: "Report", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Retry recipient preview" }),
+  ).toBeVisible();
+  await page.unroute("**/api/passports/preview");
+  await page.getByRole("button", { name: "Retry recipient preview" }).click();
+  await expect(
+    page.getByRole("button", { name: "Generate passport snapshot" }),
+  ).toBeEnabled();
   await page
     .getByRole("checkbox", { name: "Include cash-flow totals" })
     .uncheck();

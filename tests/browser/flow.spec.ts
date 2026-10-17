@@ -25,6 +25,7 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
   await page
     .getByRole("combobox", { name: "Category for newcomer-correction" })
     .selectOption("transfer");
+  await expect(page.getByText(/Saved your correction/)).toBeVisible();
   await page.getByRole("button", { name: "See assessment →" }).click();
   await expect(page.locator(".score")).toContainText("70");
   await expect(page.getByText("$50,400", { exact: true })).toBeVisible();
@@ -171,6 +172,7 @@ test("loading, empty search, contradictory correction and profile-choice refresh
   await page
     .getByRole("combobox", { name: "Category for newcomer-correction" })
     .selectOption("expense");
+  await expect(page.getByText(/Saved your correction/)).toBeVisible();
   await page.getByRole("button", { name: "See assessment →" }).click();
   await expect(
     page.getByRole("heading", { name: "More evidence needed" }),

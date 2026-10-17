@@ -1,5 +1,5 @@
 import type { State, Explanation } from "../src/contracts.js";
-export const PROMPT_VERSION = "folio-evidence-v1";
+export const PROMPT_VERSION = "folio-evidence-v2";
 export const kinds = [
   "cashflow",
   "factors",
@@ -124,7 +124,7 @@ export function paragraph(s: State, kind: ClaimKind) {
       )[0];
       return {
         text: !weakest
-          ? "The next useful step is to supply the missing evidence listed above. A missing record cannot be replaced with a favorable assumption."
+          ? `The next useful step is to supply the missing evidence: ${a.missing.join("; ")}. A missing record cannot be replaced with a favorable assumption.`
           : `The smallest relative contribution is ${weakest.name}: ${weakest.points.toFixed(2)} of ${weakest.maximum} points. You can explore how lower observed expenses or a stronger documented cash buffer would change this model, without changing your records. These are conditional calculations, not a promise of credit approval.`,
         evidence: weakest?.evidence.slice(0, 12) || [],
         metrics: ["factors", "missing"],

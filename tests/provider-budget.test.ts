@@ -44,3 +44,74 @@ test("SQLite numbered bindings preserve owner and scope when SQL references are 
     await store.close();
   }
 });
+
+test("shared refusal rolls back the personal allowance", async () => {
+  const store = new Store();
+  await store.init();
+  try {
+    await store.create("owner-a", demoState("newcomer"));
+    await store.create("owner-b", demoState("newcomer"));
+    assert.equal(
+      await store.reserveProviderBudgets(
+        "owner-a",
+        "gemini",
+        "shared-test",
+        1,
+        1,
+      ),
+      true,
+    );
+    assert.equal(
+      await store.reserveProviderBudgets(
+        "owner-b",
+        "gemini",
+        "shared-test",
+        1,
+        1,
+      ),
+      false,
+    );
+    assert.equal(
+      (
+        await store.query(
+          "SELECT count FROM folio_provider_limits WHERE owner=$1",
+          ["owner-b"],
+        )
+      ).length,
+      0,
+    );
+    assert.equal(
+      await store.reserveProviderBudgets(
+        "owner-b",
+        "gemini",
+        "available-test",
+        1,
+        1,
+      ),
+      true,
+    );
+    assert.equal(
+      await store.reserveProviderBudgets(
+        "owner-b",
+        "gemini",
+        "available-test",
+        1,
+        1,
+      ),
+      false,
+    );
+    assert.equal(
+      Number(
+        (
+          await store.query(
+            "SELECT count FROM folio_service_limits WHERE scope=$1",
+            ["available-test"],
+          )
+        )[0].count,
+      ),
+      1,
+    );
+  } finally {
+    await store.close();
+  }
+});
