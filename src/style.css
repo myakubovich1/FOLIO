@@ -1511,7 +1511,7 @@ td select {
     opacity: 0.45;
   }
 }
-.preview-loading::before,
+.preview-loading[data-pending="true"]::before,
 .loading::after {
   content: "";
   width: 36px;
@@ -1541,6 +1541,9 @@ td select {
   animation: pending-pulse 1.2s ease-in-out infinite;
 }
 @media (min-width: 801px) {
+  html:has(.workspace-header) {
+    scroll-padding-top: 112px;
+  }
   .workspace-header {
     position: sticky;
     top: 0;

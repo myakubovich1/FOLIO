@@ -364,7 +364,11 @@ function Landing({
                 </p>
               </>
             ) : (
-              <div className="preview-loading" role="status">
+              <div
+                className="preview-loading"
+                data-pending={!error}
+                role="status"
+              >
                 {error || "Calculating the selected demo preview…"}
               </div>
             )}
