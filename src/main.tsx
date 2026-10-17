@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { State, Assessment, Passport } from "./contracts";
-import { api, money } from "./api";
+import { api, money, displayDate } from "./api";
 import { Logo } from "./components/Logo";
+import { Icon } from "./components/Icon";
 import { Report } from "./components/Report";
 import { Sources } from "./components/Sources";
 import { Records } from "./components/Records";
@@ -264,18 +265,9 @@ function Landing({
             <em>history.</em>
           </h1>
           <p className="intro">
-            Your financial life is more than a credit file. Turn the activity
-            you already have into a clear, explainable alternative assessment.
-            No existing credit score required.
+            Turn the records you already have into a financial picture you can
+            understand, improve and share. No existing credit score required.
           </p>
-          <div className="hero-actions">
-            <button className="primary" onClick={onAccount}>
-              Build your profile <span>↗</span>
-            </button>
-            <a className="text-link" href="#demo-selector">
-              Explore demo ↓
-            </a>
-          </div>
           <div id="demo-selector" className="demo-selector">
             <label htmlFor="profile">Explore a synthetic borrower</label>
             <select
@@ -289,80 +281,98 @@ function Landing({
                 </option>
               ))}
             </select>
-            <button className="secondary" disabled={busy} onClick={onStart}>
-              Build your demo profile ↗
-            </button>
+            <div className="hero-actions">
+              <button className="primary" disabled={busy} onClick={onStart}>
+                {busy ? "Opening your demo…" : "Build your demo profile"}
+                <Icon name="arrow" />
+              </button>
+              <button className="text-link" onClick={onAccount}>
+                Build your profile
+              </button>
+            </div>
+            <span className="demo-reassurance">
+              Synthetic records. No bank login needed.
+            </span>
           </div>
           <p className="fine">
             {identity?.authConfigured
-              ? "Private accounts use Auth0 sign-in."
-              : "Private account sign-in needs server configuration; synthetic demos work now."}{" "}
+              ? "Private accounts use secure sign-in."
+              : "Private sign-in is not available in this demo."}{" "}
             No loan approval or lender acceptance is promised.
           </p>
         </section>
-        <aside className="hero-card">
-          <div className="split">
-            <span className="pill">A working assessment preview</span>
-            <span className="preview-mark">F/</span>
-          </div>
-          <div className="preview-markets">
-            <button
-              aria-pressed={selected === "newcomer"}
-              onClick={() => onSelected("newcomer")}
-            >
-              United States · USD
-            </button>
-            <button
-              aria-pressed={selected === "farmer"}
-              onClick={() => onSelected("farmer")}
-            >
-              Kenya · KES
-            </button>
-          </div>
-          {preview ? (
-            <>
-              <div className="eyebrow">FOLIO CREDIT INDEX · SYNTHETIC DATA</div>
-              <div className="score">
-                {preview.score ?? "—"}
-                <small>
-                  {preview.score === null ? "More evidence needed" : "/ 100"}
-                </small>
-              </div>
-              <h2>
-                {preview.score === null
-                  ? "A useful next step, not a zero."
-                  : "See what is behind the number."}
-              </h2>
-              <p>{preview.confidence}</p>
-              {preview.factors.map((f) => (
-                <div className="preview-factor" key={f.name}>
-                  <div>
-                    <span>{f.name}</span>
-                    <strong>
-                      {f.points.toFixed(1)} / {f.maximum}
-                    </strong>
-                  </div>
-                  <span className="track">
-                    <i style={{ width: `${(f.points / f.maximum) * 100}%` }} />
-                  </span>
-                </div>
-              ))}
-              {preview.missing.slice(0, 2).map((m) => (
-                <p className="caution" key={m}>
-                  {m}
-                </p>
-              ))}
-              <p className="fine">
-                {preview.start} to {preview.end} · experimental scorecard v1.
-                Calculated from the selected synthetic records.
-              </p>
-            </>
-          ) : (
-            <div className="preview-loading" role="status">
-              {error || "Calculating the selected demo preview…"}
+        <div className="preview-stage">
+          <aside className="hero-card" aria-label="Selected borrower preview">
+            <div className="split">
+              <span className="pill">A working assessment preview</span>
+              <span className="preview-mark">F/</span>
             </div>
-          )}
-        </aside>
+            <div className="preview-markets">
+              <button
+                aria-pressed={selected === "newcomer"}
+                onClick={() => onSelected("newcomer")}
+              >
+                United States · USD
+              </button>
+              <button
+                aria-pressed={selected === "farmer"}
+                onClick={() => onSelected("farmer")}
+              >
+                Kenya · KES
+              </button>
+            </div>
+            {preview ? (
+              <>
+                <div className="eyebrow">
+                  FOLIO CREDIT INDEX · SYNTHETIC DATA
+                </div>
+                <div className="score">
+                  {preview.score ?? "—"}
+                  <small>
+                    {preview.score === null ? "More evidence needed" : "/ 100"}
+                  </small>
+                </div>
+                <h2>
+                  {preview.score === null
+                    ? "A useful next step, not a zero."
+                    : "See what is behind the number."}
+                </h2>
+                <p>{preview.confidence}</p>
+                {preview.factors.map((f) => (
+                  <div className="preview-factor" key={f.name}>
+                    <div>
+                      <span>{f.name}</span>
+                      <strong>
+                        {f.points.toFixed(1)} / {f.maximum}
+                      </strong>
+                    </div>
+                    <span className="track">
+                      <i
+                        style={{ width: `${(f.points / f.maximum) * 100}%` }}
+                      />
+                    </span>
+                  </div>
+                ))}
+                {preview.missing.slice(0, 2).map((m) => (
+                  <p className="caution" key={m}>
+                    {m}
+                  </p>
+                ))}
+                <p className="fine">
+                  {preview.start} to {preview.end} · experimental scorecard v1.
+                  Calculated from the selected synthetic records.
+                </p>
+              </>
+            ) : (
+              <div className="preview-loading" role="status">
+                {error || "Calculating the selected demo preview…"}
+              </div>
+            )}
+          </aside>
+          <p className="preview-caption">
+            <Icon name="records" /> Your records. A clearer perspective.
+          </p>
+        </div>
       </main>
       <section className="marketing-section" id="how-it-works">
         <div className="eyebrow">A FINANCIAL RECORD THAT MAKES SENSE</div>
@@ -475,6 +485,8 @@ function App() {
     [shared, setShared] = useState<Passport | null>(null),
     [evidence, setEvidence] = useState<string[] | null>(null),
     [accountInfo, setAccountInfo] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const previousPage = useRef(page);
   const token = location.pathname.startsWith("/shared/")
     ? location.pathname.split("/")[2]
     : null;
@@ -551,7 +563,10 @@ function App() {
     };
   }, [token, infoPage]);
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "instant" });
+    if (previousPage.current !== page)
+      titleRef.current?.focus({ preventScroll: true });
+    previousPage.current = page;
     setEvidence(null);
   }, [page]);
   async function run(fn: () => Promise<void>) {
@@ -711,7 +726,7 @@ function App() {
     );
   return (
     <>
-      <header className="main-header">
+      <header className={`main-header ${state ? "workspace-header" : ""}`}>
         <Logo />
         {state ? (
           <>
@@ -743,20 +758,24 @@ function App() {
                 {identity?.authenticated ? "My profile" : "Log in"}
               </button>
             </nav>
-            <button className="primary header-start" onClick={account}>
-              Build your profile
-            </button>
+            {identity?.authConfigured || identity?.authenticated ? (
+              <button className="primary header-start" onClick={account}>
+                Build your profile
+              </button>
+            ) : (
+              <a className="button primary header-start" href="#demo-selector">
+                Try the demo <Icon name="arrow" />
+              </a>
+            )}
           </>
         )}
       </header>
       {accountInfo && (
         <section className="setup-notice" role="status">
-          <strong>
-            Private accounts need Auth0 configuration on this server.
-          </strong>
+          <strong>Private sign-in is not available on this demo.</strong>
           <p>
-            The synthetic demo works now. Configure the server’s local
-            environment using the setup guide; never enter secrets here.
+            You can try the full journey with synthetic records. Real financial
+            uploads require a configured private account.
           </p>
           <button onClick={() => setAccountInfo(false)}>
             Continue exploring
@@ -791,22 +810,33 @@ function App() {
       ) : (
         <div className="shell">
           <nav className="app-nav" aria-label="Main navigation">
-            {["Overview", "Records", "Assessment", "Report", "Settings"].map(
-              (p, i) => (
-                <button
-                  key={p}
-                  data-page={p}
-                  aria-current={page === p ? "page" : undefined}
-                  className={page === p ? "active" : ""}
-                  onClick={() => setPage(p)}
-                >
-                  <span className="nav-symbol" aria-hidden="true">
-                    {["◫", "≡", "↗", "▤", "⚙"][i]}
-                  </span>
-                  {p}
-                </button>
-              ),
-            )}
+            {(
+              [
+                ["Overview", "overview"],
+                ["Records", "records"],
+                ["Report", "report"],
+                ["Settings", "settings"],
+              ] as const
+            ).map(([p, icon]) => (
+              <button
+                key={p}
+                data-page={p}
+                aria-current={
+                  page === p || (p === "Overview" && page === "Assessment")
+                    ? "page"
+                    : undefined
+                }
+                className={
+                  page === p || (p === "Overview" && page === "Assessment")
+                    ? "active"
+                    : ""
+                }
+                onClick={() => setPage(p)}
+              >
+                <Icon name={icon} />
+                {p}
+              </button>
+            ))}
             <div className="nav-note">
               <span className="status-dot" />
               Your records, your control.<p>No credit file required.</p>
@@ -814,9 +844,14 @@ function App() {
             </div>
           </nav>
           <main className="workspace">
+            {page === "Assessment" && (
+              <button className="back-link" onClick={() => setPage("Overview")}>
+                <span aria-hidden="true">←</span> Back to overview
+              </button>
+            )}
             <div className="eyebrow">{state.borrower.context}</div>
-            <div className="title-row">
-              <h1>
+            <div className="title-row" key={page}>
+              <h1 ref={titleRef} tabIndex={-1}>
                 {page === "Context"
                   ? "Start with your context."
                   : page === "Records"
@@ -873,41 +908,42 @@ function App() {
                 </details>
               </section>
             )}
-            {page !== "Settings" && (
-              <ol className="journey" aria-label="Borrower journey">
-                {[
-                  ["Context", "Your context"],
-                  ["Records", "Add records"],
-                  ["Review", "Review"],
-                  ["Assessment", "Your assessment"],
-                ].map(([destination, label], i) => (
-                  <li key={label}>
-                    <button
-                      aria-current={
-                        page === destination ||
-                        (destination === "Review" &&
-                          page === "Records" &&
-                          state.connected)
-                          ? "step"
-                          : undefined
-                      }
-                      onClick={() =>
-                        setPage(
-                          destination === "Review" ? "Records" : destination,
-                        )
-                      }
-                      disabled={
-                        !state.connected &&
-                        ["Review", "Assessment"].includes(destination)
-                      }
-                    >
-                      <span>{i + 1}</span>
-                      {label}
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            )}
+            {(!state.connected || ["Context", "Records"].includes(page)) &&
+              page !== "Settings" && (
+                <ol className="journey" aria-label="Borrower journey">
+                  {[
+                    ["Context", "Your context"],
+                    ["Records", "Add records"],
+                    ["Review", "Review"],
+                    ["Assessment", "Your assessment"],
+                  ].map(([destination, label], i) => (
+                    <li key={label}>
+                      <button
+                        aria-current={
+                          page === destination ||
+                          (destination === "Review" &&
+                            page === "Records" &&
+                            state.connected)
+                            ? "step"
+                            : undefined
+                        }
+                        onClick={() =>
+                          setPage(
+                            destination === "Review" ? "Records" : destination,
+                          )
+                        }
+                        disabled={
+                          !state.connected &&
+                          ["Review", "Assessment"].includes(destination)
+                        }
+                      >
+                        <span>{i + 1}</span>
+                        {label}
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              )}
             {page === "Context" && (
               <Context
                 state={state}
@@ -1137,7 +1173,10 @@ function AssessmentView({
         <div
           className={`score-card ${a.score === null ? "unscored-card" : ""}`}
         >
-          <div className="eyebrow">FOLIO CREDIT INDEX</div>
+          <div className="score-heading">
+            <div className="eyebrow">FOLIO CREDIT INDEX</div>
+            <Icon name="trend" />
+          </div>
           <div className="score">
             {a.score ?? "—"}
             <small>{a.score === null ? "More evidence needed" : "/ 100"}</small>
@@ -1159,22 +1198,36 @@ function AssessmentView({
           </button>
         </div>
         <div className="card evidence-summary">
-          <div className="eyebrow">EVIDENCE, SEPARATE FROM THE SCORE</div>
+          <div className="eyebrow">THE EVIDENCE BEHIND IT</div>
           <h2>{a.confidence}</h2>
-          <p>
-            {a.start || "Coverage not established"} →{" "}
-            {a.end || "coverage not established"}
-            <br />
-            (end exclusive)
+          <p className="evidence-intro">
+            Evidence confidence describes the available records, separately from
+            your index.
           </p>
-          <p>
-            {a.sourceKind === "synthetic"
-              ? "Saved synthetic data"
-              : a.sourceKind === "sandbox"
-                ? "Nessie banking simulation"
-                : "User-provided financial records"}{" "}
-            · {state.borrower.months} observed months
-          </p>
+          <dl className="evidence-facts">
+            <div>
+              <dt>Source</dt>
+              <dd>
+                {a.sourceKind === "synthetic"
+                  ? "Saved synthetic data"
+                  : a.sourceKind === "sandbox"
+                    ? "Nessie banking simulation"
+                    : "User-provided financial records"}
+              </dd>
+            </div>
+            <div>
+              <dt>Observed history</dt>
+              <dd>{state.borrower.months} months</dd>
+            </div>
+            <div>
+              <dt>Period</dt>
+              <dd>
+                {a.start ? displayDate(a.start) : "Not established"} →{" "}
+                {a.end ? displayDate(a.end) : "Not established"}
+                <small>End date excluded</small>
+              </dd>
+            </div>
+          </dl>
           {a.missing.map((m) => (
             <p className="caution" key={m}>
               {m}
@@ -1192,15 +1245,21 @@ function AssessmentView({
         <h2>What the records say</h2>
         <div className="metrics">
           <div>
-            <small>External income</small>
+            <span className="metric-label">
+              <Icon name="income" /> External income
+            </span>
             <strong>{money(a.income, a.currency)}</strong>
           </div>
           <div>
-            <small>Expenses, net of refunds</small>
+            <span className="metric-label">
+              <Icon name="expense" /> Expenses, net of refunds
+            </span>
             <strong>{money(a.expenses, a.currency)}</strong>
           </div>
           <div>
-            <small>Residual cash flow</small>
+            <span className="metric-label">
+              <Icon name="trend" /> Residual cash flow
+            </span>
             <strong>{money(a.net, a.currency)}</strong>
           </div>
         </div>

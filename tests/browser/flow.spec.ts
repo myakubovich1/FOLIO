@@ -27,6 +27,17 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
     .selectOption("transfer");
   await expect(page.getByText(/Saved your correction/)).toBeVisible();
   await page.getByRole("button", { name: "See assessment →" }).click();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("button"),
+  ).toHaveCount(4);
+  await expect(
+    page.getByRole("button", { name: "Overview", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(
+    page.getByRole("heading", { name: "Understand your assessment." }),
+  ).toBeFocused();
   await expect(page.locator(".score")).toContainText("70");
   await expect(page.getByText("$50,400", { exact: true })).toBeVisible();
   await page.screenshot({
