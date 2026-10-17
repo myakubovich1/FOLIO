@@ -1,6 +1,8 @@
 # Verified delivery evidence
 
-Product source reviewed at **8cc031f85ea5fbda5abc86dacf376cb7d32b4db1**; Claude found no actionable issue in its focused cleanup check. Earlier financial/provider/migration/access findings and verified repairs are in reviews/PRODUCT-CYCLE.md and per-commit reports. Subsequent closeout changes are documentation/evidence only.
+Latest UI source reviewed at **dea85f91cae053a1c9d49f3d4d5d4abbb679e794**; the final follow-up confirms the icon, error-indicator and focus-clearance repairs with no new findings. The final UI suite passes14/14 and both axe reports contain zero violations. See [UI checkpoint](checkpoint-ui.md) and `output/verification/ui-manifest.json`.
+
+The provider/architecture baseline below was reviewed at **8cc031f85ea5fbda5abc86dacf376cb7d32b4db1**. Provider/migration/access findings and repairs are in reviews/PRODUCT-CYCLE.md and per-commit reports. Live-provider evidence was not regenerated for the UI refinement.
 
 | Check | Actual result | Local evidence / reproduction |
 |---|---|---|
@@ -17,6 +19,6 @@ Product source reviewed at **8cc031f85ea5fbda5abc86dacf376cb7d32b4db1**; Claude 
 | Visuals/PDF |Desktop/mobile main states,1440/768/390/320 widths, keyboard/overflow/axe checks; rendered scored, limited and live Nessie PDF pages inspected |output/screenshots; output/pdf; nessie-live-passport.pdf |
 | Secrets |.env.local and local CA ignored; environment mode600; no configured secret values in tracked files |git check-ignore .env.local; local scan performed without printing values |
 
-Artifacts remain ignored local outputs; manifest.json records60 current files, source revisions, sizes and SHA256 hashes. Screenshots and tiny synthetic evaluations do not certify accessibility, user acceptance, repayment prediction or production readiness. Prior quota/timeouts/unsupported-evidence failures were retained in local logs and drove schema/latency/recovery changes.
+Artifacts remain ignored local outputs; manifest.json records60 baseline paths with refreshed hashes/source attribution for changed UI captures. ui-manifest.json records the latest UI checks and captures; manifest.pre-ui.json preserves the previous baseline hashes. Screenshots and tiny synthetic evaluations do not certify accessibility, user acceptance, repayment prediction or production readiness. Prior quota/timeouts/unsupported-evidence failures were retained in local logs and drove schema/latency/recovery changes.
 
 Remaining external acceptance is explicit: Auth0 tenant login/callback/logout and private upload journeys with two real accounts; intended HTTPS deployment/public repository; human eligibility, category/winning clarification and Devpost submission. Nessie sandbox and saved synthetic data are labeled distinctly. The free Tiger service is pinned under user-approved trust on first use, not a publicly trusted certificate chain.

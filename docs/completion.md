@@ -1,5 +1,7 @@
 # Requirement completion report
 
+Latest UI refinement and exact reviewed-source evidence: [Wise-inspired UI checkpoint](checkpoint-ui.md).
+
 Folio is a working local application with **actual Nessie reads, Gemini generation/PDF extraction, and Tiger Cloud persistence**. The complete synthetic borrower journey is implemented. Auth0 tenant login/callback/logout and private-account external acceptance remain pending; no public HTTPS host/repository or Devpost submission has been provisioned. Software execution, source review and external acceptance are separate. The free synthetic Tiger service uses explicitly approved certificate pinning, not public-CA attestation.
 
 | Original requirement | Implemented result | Tested evidence / remaining limit |
