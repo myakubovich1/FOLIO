@@ -79,13 +79,54 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
   await expect(inspector).toContainText(exactMoney(second.income));
   if (info.project.name === "mobile") {
     const last = assessed.monthly.at(-1);
-    await page
-      .getByRole("button", { name: `View ${monthName(last.month)} cash flow` })
-      .tap();
-    await expect(inspector).toContainText(monthName(last.month));
-    expect(
-      await page.locator(".cashflow-scroll").evaluate((el) => el.scrollLeft),
-    ).toBeGreaterThan(0);
+    const lastMonth = page.getByRole("button", {
+      name: `View ${monthName(last.month)} cash flow`,
+    });
+    const scroller = page.locator(".cashflow-scroll");
+    await scroller.scrollIntoViewIfNeeded();
+    const metrics = await scroller.evaluate((el) => ({
+      width: el.clientWidth,
+      content: el.scrollWidth,
+    }));
+    expect(metrics.content).toBeGreaterThan(metrics.width);
+    const isInside = () =>
+      lastMonth.evaluate((button) => {
+        const region = button
+          .closest(".cashflow-scroll")!
+          .getBoundingClientRect();
+        const box = button.getBoundingClientRect();
+        return box.left >= region.left && box.right <= region.right;
+      });
+    expect(await isInside()).toBe(false);
+    const bounds = (await scroller.boundingBox())!;
+    const touch = await context.newCDPSession(page);
+    try {
+      for (let swipe = 0; swipe < 3; swipe++) {
+        const x = bounds.x + bounds.width - 16,
+          y = bounds.y + 90;
+        await touch.send("Input.dispatchTouchEvent", {
+          type: "touchStart",
+          touchPoints: [{ x, y }],
+        });
+        for (let step = 1; step <= 12; step++) {
+          await touch.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: [{ x: x - ((bounds.width - 32) * step) / 12, y }],
+          });
+        }
+        await touch.send("Input.dispatchTouchEvent", {
+          type: "touchEnd",
+          touchPoints: [],
+        });
+      }
+      await expect.poll(isInside).toBe(true);
+      expect(await scroller.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+      // Already visible after the gestures: tap's auto-scroll cannot prove this assertion.
+      await lastMonth.tap();
+      await expect(inspector).toContainText(monthName(last.month));
+    } finally {
+      await touch.detach();
+    }
   }
 
   await page.screenshot({
@@ -223,6 +264,14 @@ test("profile switches keep currency and assessment attached to the selected bor
       }),
     );
     expect(bars).toHaveLength(monthly.length);
+    if (profile === "farmer") {
+      const zeroMonth = monthly.findIndex(
+        (row: { income: number }) => row.income === 0,
+      );
+      expect(zeroMonth).toBeGreaterThanOrEqual(0);
+      expect(bars[zeroMonth].heights[0]).toBeLessThan(0.5);
+    }
+
     monthly.forEach(
       (row: { income: number; spending: number }, index: number) => {
         for (const [series, value] of [row.income, row.spending].entries()) {
