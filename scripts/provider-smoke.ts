@@ -68,6 +68,33 @@ if (process.env.NESSIE_API_KEY && process.env.NESSIE_CUSTOMER_ID) {
     liveRequestSucceeded: false,
     blocked: "NESSIE_API_KEY / NESSIE_CUSTOMER_ID absent",
   };
+// Reproduce the review stage only for the exact synthetic deposits seeded by
+// this repository. Never infer arbitrary bank deposits as earnings.
+if (state.borrower.sourceKind === "sandbox") {
+  let confirmed = 0;
+  for (const r of state.borrower.records)
+    if (
+      r.amount > 0 &&
+      r.category === "unknown" &&
+      /^FOLIO-SEED-v1-2025-\d{2}-synthetic-client-payment$/.test(
+        r.originalValues?.description || "",
+      )
+    ) {
+      r.category = "income";
+      r.interpretation = "user-confirmed";
+      confirmed++;
+    }
+  if (confirmed) {
+    state.revision++;
+    state.assessment = assess(state.borrower, state.revision);
+  }
+  report.syntheticReview = {
+    confirmedSeedDeposits: confirmed,
+    incomeAfterReview: state.assessment?.income,
+    scoreAfterReview: state.assessment?.score,
+    note: "Scripted confirmation of our explicitly marked synthetic fixture only. Original categories retained. Withdrawals and missing history remain unresolved; no automatic deposit-to-income rule is used by the application.",
+  };
+}
 if (process.env.GEMINI_API_KEY && process.env.GEMINI_MODEL) {
   try {
     const explanation = await geminiExplanation(

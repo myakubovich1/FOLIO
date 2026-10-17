@@ -1,61 +1,70 @@
-# Folio
-Credit beyond your credit history. An experimental, explainable alternative assessment from permissioned financial activity, with a portable financial passport. No existing credit score required; no lender acceptance or predictive repayment validity is claimed.
+# FOLIO
 
-## Nessie, Gemini and Tiger Data are core product capabilities
+**Credit beyond your credit history.** Permissioned financial records → review and correction → deterministic alternative assessment → portable financial passport → expiring sharing and revocation. An existing credit score is not required. This experimental scorecard is not a lending decision, repayment prediction, or promise of lender acceptance.
 
-Nessie performs **actual server-side API reads** of a dedicated synthetic banking customer, normalizes supported resources, persists source references and uses those records in the assessment and passport. Gemini performs **actual server-side generation** for supported explanation claims/citations, PDF extraction and suggested interpretation; financial math stays deterministic. No saved fixture is substituted for a failed live-provider check.
+## Core sponsor integrations
 
-This workspace has completed actual Nessie reads, Gemini explanation generation, and a two-row PDF extraction with `gemini-3.8-flash`. Tiger Cloud configuration is being verified; local Timescale persistence and queries are tested. Enter all credentials in the ignored local `.env.local` (never chat). Run `npm run providers:check` for configuration/discovery, then `npm run providers:smoke` for actual Nessie → normalized records → assessment → persistence/passport and actual Gemini explanation/PDF requests. `npm run eval:ai` records numerical/evidence and configured live classification/explanation checks separately. A model listing or adapter implementation is not a completed live integration.
+- **Capital One Nessie:** actual API reads from a dedicated synthetic customer, supported resource/capability checks, exact-money normalization, source references and persistent assessments/passports. The configured demo has three deposits and three withdrawals. Missing history and unclassified cash movements cause an honest unscored result.
+- **Gemini:** actual server-side structured PDF extraction, classification/pattern suggestions and evidence-grounded questions through Google's SDK. Source IDs, citations and schemas are verified; code renders financial figures from deterministic metrics. The current configured model is `gemini-3.1-flash-lite`. Earlier `gemini-3.8-flash` requests succeeded, then reached its daily free-tier limit. No model or fixture is silently substituted on a failed request.
+- **Tiger Data:** actual Tiger Cloud PostgreSQL/Timescale persistence. A transaction hypertable and owner/currency daily continuous aggregate power cash-flow history. Cloud cutover preserved **221 workspaces,10,710 records,235 assessments and61 shares**. Two actual app restarts retained corrections, immutable passports, sessions and revocation; another session was denied private passport/share operations.
 
-With only a Nessie key, `npm run nessie:setup` shows a plan; `npm run nessie:setup -- --apply` creates/finds a dedicated synthetic customer and saves its ID locally. Run `nessie:seed` to inspect the seed plan, then explicit `--apply` if desired. The optional `FOLIO_PUBLIC_SANDBOX=true` permits isolated public demo sessions to read that shared **synthetic-only** customer without requiring Auth0; private uploads/owner data remain authenticated. It defaults off, and is explicitly on in this local judge-demo workspace.
+Targets: Nessie, Gemini, Tiger Data, AI/ML, UI/UX and Overall, subject to the [official event rules](https://swamphacks-xii.devpost.com/rules). See the [category-to-feature demonstration checklist](docs/category-checklist.md), [actual sponsor evidence](docs/sponsor-map.md), [demo scripts](docs/demo.md) and [Devpost draft](docs/devpost-draft.md). The draft has not been submitted.
 
-See the [category checklist](docs/category-checklist.md), [provider/action evidence](docs/sponsor-map.md), [live walkthrough](docs/demo.md), [Devpost draft](docs/devpost-draft.md) and [secret-entry instructions](docs/configuration.md). Target: Nessie, Gemini, Tiger Data, AI/ML, UI/UX and Overall, subject to actual eligibility and category rules. The category checklist separates actual external calls from adapter tests and unresolved external checks.
+## Run locally
 
-Active local workspace after iCloud recovery: `/Users/myakubovich/Projects/FOLIO`. The original Documents repository is preserved; see [recovery provenance](docs/recovery.md).
+Active workspace: `/Users/myakubovich/Projects/FOLIO`. The original iCloud Documents repository is preserved; [recovery provenance](docs/recovery.md) explains the separate source recovery.
 
-## Local setup
-Node 22.17+ is required. The application uses Next.js App Router with a co-hosted Express API. Tiger Data/Postgres is the connected source of truth; an explicit SQLite adapter supports service-free synthetic demos. A configured database failure never silently switches storage.
+Node22.17+ is required. Next.js App Router and Express share a server; database access, provider keys and score math stay on the server.
 
 ```sh
+cd /Users/myakubovich/Projects/FOLIO
 npm ci
-cp .env.example .env.local # only if it does not already exist
-# Enter configuration in the local editor; never paste secrets into chat or Git.
+# Only on a fresh checkout: copy .env.example to .env.local if absent.
+# Enter credentials in the ignored local file, never chat or Git.
 npm run dev
-# http://localhost:3100 (port 3000 is used by another local application)
+# http://localhost:3100
 ```
 
-See [configuration and secret entry](docs/configuration.md), [original requirements](docs/requirements.md), [assessment contract](docs/assessment.md), [completion tracker](docs/completion.md), and [shared project brief](docs/project-brief.md). External provider credentials are not required for the labeled synthetic demo.
+For production-mode rehearsal: `npm run build` then `npm start`. Do not rebuild while a production app/browser test server is running. Port3000 belongs to a separate application.
+
+For service-free rehearsal, leave `DATABASE_URL` and external provider variables absent in a separate local configuration. The clearly labeled five-profile synthetic demo uses SQLite, calculated explanations, correction, PDF export and sharing/revocation without external services. A configured database failure never silently falls back.
+
+For local Timescale: `docker compose up -d`; use the development URI from docker-compose.yml, then `npm run db:migrate` and `npm run db:seed`. For Tiger Cloud, set `DATABASE_URL` and follow [configuration](docs/configuration.md) and [database cutover](docs/database-transfer.md). The current free synthetic service uses an explicitly approved local certificate pin; no TLS verification bypass is enabled.
+
+## Verify
 
 ```sh
-npm run lint
 npm run typecheck
+npm run lint
 npm test
 npm run build
-npm run test:e2e # production-mode browser server on port 3101
+npm run test:e2e
+npm run providers:check
+npm run providers:smoke
+npm run eval:ai
+npm run verify:persistence
+npm run export:demo
 ```
 
-Optional local TimescaleDB: `docker compose up -d`; then use `DATABASE_URL=postgresql://folio:local-development-only@127.0.0.1:5433/folio npm run db:migrate`. This is a local development password, not a production secret. To run database integration tests, set `FOLIO_TEST_DATABASE_URL` to that local URI when running `npm test`.
+`FOLIO_TEST_DATABASE_URL` enables actual database tests; keep that URI in local process configuration. `verify:persistence` starts temporary production app processes on3103 and cleans up its own synthetic workspaces. Live provider checks consume provider quota; they report actual failures instead of fixtures. Screenshots, PDF exports and sanitized machine-readable evidence live under `output/`. [Verification](docs/verification.md), [completion report](docs/completion.md) and [review cycle](reviews/PRODUCT-CYCLE.md) distinguish implementation, execution and external blockers.
 
-Tiger Data persists source history, all assessment revisions and passport/share state. A daily Timescale continuous aggregate powers the borrower cash-flow chart and exact monthly table, with owner/currency filtering and historical correction refresh. See [database cutover and verification](docs/database-transfer.md); `npm run db:transfer` preserves the existing PostgreSQL or SQLite source without overwriting destination owners.
+With a Nessie key only: `npm run nessie:setup -- --apply` finds/creates the dedicated synthetic customer and saves its ID locally. `npm run nessie:seed` previews writes; `-- --apply` creates marked resources idempotently. `FOLIO_PUBLIC_SANDBOX=true` explicitly allows isolated public sessions to read that dedicated mock customer; it never enables arbitrary customer selection or private uploads. Default is false.
 
 ## Two-agent workflow
-Codex in this chat is the sole builder and coordinator. Claude Code is the sole independent reviewer. Both read docs/project-brief.md and docs/assessment.md; reviewers receive immutable exports of exact Git commits. Continue this chat or, after stopping it, use `npm run builder`.
+
+Codex is the sole builder/coordinator; Claude Code is the sole independent reviewer. Both receive `docs/project-brief.md` and `docs/assessment.md`. Claude reviews immutable Git exports using Read/Glob/Grep only, with no shell, edits, hooks, MCP servers or subagents.
 
 ```sh
+# Resume Codex here, or after stopping this chat's builder:
+npm run builder
+# Review the exact committed snapshot:
 env -u ANTHROPIC_API_KEY npm run review -- HEAD
 ```
 
-This machine's API-key balance was exhausted; the process-local override selects its existing Claude Pro login. Review tools are restricted to Read/Glob/Grep with no shell, edits, subagents, hooks or MCP servers. These are supported CLI tool permissions, not an OS sandbox. Results are saved in `reviews/<commit>.json`. A second simultaneous review is refused. `npm run review -- HEAD <session_id>` resumes a saved review with new source context while using its original conversation directory; if temporary directories were cleaned up, start a fresh review. Only the parent shell writes review output.
+The process-local override uses the existing Claude Pro login. A simultaneous second reviewer is refused. Reports are `reviews/<commit>.json`; dispositions document verified fixes. A saved review can resume with `npm run review -- HEAD <session_id>` while its original temporary directory exists. Only assign independent Claude implementation with agreed contracts, a separate Git worktree/branch and explicit file ownership.
 
-The initial workflow cycle is recorded in [reviews/CYCLE.md](reviews/CYCLE.md). New product checkpoints include their own reviewed commit and finding dispositions. Only assign Claude independent implementation in a separate `codex/claude-<task>` worktree after defining owned files and acceptance criteria; no parallel worker has been used.
+## Remaining external acceptance
 
-## Status
-This repository is being completed against the original brief. Adapter implementation, software tests and actual live-provider verification are tracked separately in docs/completion.md. Do not treat a local synthetic demo as production readiness. Auth0 tenant login/callback remains pending. Nessie and Gemini have succeeded live; Tiger Cloud TLS and cutover are being validated. All fonts are self-hosted through Fontsource and use SIL OFL; SVG identity is original Folio work. AI assistance is disclosed in review and demo documentation.
+Auth0 configuration is pending: actual two-account login/callback/logout and private upload acceptance cannot be certified by the isolated test-identity harness. A public HTTPS deployment, public repository URL, human team eligibility and Devpost submission also remain operator steps. Provider limits and latency can affect live rehearsal; calculated explanations remain explicitly available. No empirical repayment accuracy or complete WCAG certification is claimed.
 
-## Product handoff
-
-The full borrower demo now includes record review/correction, inspectable assessment drivers, evidence explanations, conditional scenarios, disclosure previews, two-page PDF export, expiring recipient links, revocation and deletion. All five US/Kenya fixtures remain clearly synthetic. For private uploads and real provider requests, enter the consolidated configuration through the ignored local file; private Auth0 login remains an external requirement.
-
-This checkout's `.env.local` now contains the supplied Tiger Cloud URI; cloud verification is tracked separately from local Timescale tests. For a fresh service-free rehearsal, leave DATABASE_URL absent in your own local environment; no external credentials are required. Do not replace an existing environment file. To generate samples/persist fixed seeds: `npm run db:seed`. To rehearse a production build: `npm run build && npm start`.
-
-Documentation: [requirement completion](docs/completion.md), [architecture](docs/architecture.md), [imports](docs/imports.md), [evaluation](docs/evaluation.md), [visual specification](docs/visual-spec.md), [verification](docs/verification.md), [deployment/runbook](docs/deployment.md), [demo scripts](docs/demo.md), [actual sponsor map and credits](docs/sponsor-map.md). `npm run providers:check`, `npm run eval:ai` and `npm run db:benchmark` produce ignored inspectable evidence under output/verification. Browser screenshots are under output/screenshots and test-results; sample PDF is output/pdf/folio-demo-passport.pdf.
+[Architecture](docs/architecture.md) · [assessment contract](docs/assessment.md) · [imports](docs/imports.md) · [evaluation](docs/evaluation.md) · [visual specification](docs/visual-spec.md) · [deployment](docs/deployment.md) · [credits](docs/sponsor-map.md)

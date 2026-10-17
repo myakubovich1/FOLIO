@@ -26,9 +26,15 @@ export async function api<T>(
       "We could not reach Folio. Check your connection and retry; saved records are preserved.",
     );
   }
-  const data = await response.json().catch(() => ({
-    error: "The service could not complete the request. Please retry.",
-  }));
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") throw e;
+    throw Error(
+      "The service returned an unreadable response. Please retry; saved records are preserved.",
+    );
+  }
   if (!response.ok)
     throw Error(data.error || "The request could not complete. Please retry.");
   return data as T;

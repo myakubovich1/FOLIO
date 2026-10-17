@@ -1,0 +1,5 @@
+# Review disposition — a69c024826d3fba86f44add01daecf0cc837b960
+
+Claude's focused source review confirmed the pin guard tests, primary pin-host failure, scoped secondary connections, authorized classification-ID enum, bounded Gemini output, safe internal Error cause, and partial-evidence caveats across assessment/explanation/recipient/PDF. No new actionable defects were found. Full report is the matching followup.json; source-only review did not execute checks.
+
+A subsequent full browser regression reproduced the intermittent landing crash. Its minified stack identified Landing's factors.map. Codex traced the invalid value to api(): body parsing caught an AbortError after an HTTP200 and returned an error object as typed success. The final repair preserves AbortError and rejects unreadable successful bodies; a direct regression test covers both. Landing additionally ignores settled responses after its selected-profile effect is cleaned up. Final review/check evidence covers that incremental repair.

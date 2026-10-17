@@ -233,12 +233,15 @@ function Landing({
     [error, setError] = useState("");
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     setPreview(null);
     setError("");
     api<Assessment>(`preview/${selected}`, "GET", undefined, controller.signal)
-      .then(setPreview)
+      .then((value) => {
+        if (active) setPreview(value);
+      })
       .catch((e) => {
-        if (e.name !== "AbortError")
+        if (active && e.name !== "AbortError")
           setError(
             "This preview could not load. You can still open the demo and retry.",
           );
