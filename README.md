@@ -40,7 +40,7 @@ For production-mode rehearsal: `npm run build` then `npm start`. Do not rebuild 
 
 For service-free rehearsal, leave `DATABASE_URL` and external provider variables absent in a separate local configuration. The clearly labeled five-profile synthetic demo uses SQLite, calculated explanations, correction, PDF export and sharing/revocation without external services. A configured database failure never silently falls back.
 
-For local Timescale: `docker compose up -d`; use the development URI from docker-compose.yml, then `npm run db:migrate` and `npm run db:seed`. For Tiger Cloud, set `DATABASE_URL` and follow [configuration](docs/configuration.md) and [database cutover](docs/database-transfer.md). The current free synthetic service uses an explicitly approved local certificate pin; no TLS verification bypass is enabled.
+For local Timescale: `docker compose up -d`; use the development URI from compose.yaml, then `npm run db:migrate` and `npm run db:seed`. For Tiger Cloud, set `DATABASE_URL` and follow [configuration](docs/configuration.md) and [database cutover](docs/database-transfer.md). The current free synthetic service uses an explicitly approved local certificate pin; no TLS verification bypass is enabled.
 
 ## Verify
 
