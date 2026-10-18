@@ -9,6 +9,8 @@ const names = [
   "DATABASE_URL",
   "APP_URL",
   "VERCEL_URL",
+  "VERCEL",
+  "VERCEL_ENV",
   "VERCEL_PROJECT_PRODUCTION_URL",
   "FOLIO_DATABASE_CERT_HOST",
   "FOLIO_DATABASE_CERT_SHA256",
@@ -52,6 +54,10 @@ test("hosted origin defaults and portable CA retain certificate and hostname enf
     assert.equal(appUrl(), "https://folio-deployment.example");
     process.env.VERCEL_PROJECT_PRODUCTION_URL = "folio.example";
     assert.equal(appUrl(), "https://folio.example");
+    process.env.VERCEL_ENV = "preview";
+    assert.equal(appUrl(), "https://folio-deployment.example");
+    process.env.VERCEL_ENV = "production";
+    assert.equal(appUrl(), "https://folio.example");
     process.env.APP_URL = "https://custom.example";
     assert.equal(appUrl(), "https://custom.example");
     process.env.FOLIO_DATABASE_CERT_HOST = "pinned.example:5432";
@@ -60,6 +66,7 @@ test("hosted origin defaults and portable CA retain certificate and hostname enf
       "postgres://pinned.example:5432/db?sslmode=verify-full";
     process.env.FOLIO_DATABASE_CA_BASE64 =
       Buffer.from("public-service-ca").toString("base64");
+    process.env.VERCEL = "1";
     const pool = databasePool(process.env.DATABASE_URL);
     try {
       const ssl = pool.options.ssl;
@@ -67,6 +74,8 @@ test("hosted origin defaults and portable CA retain certificate and hostname enf
       assert.equal(ssl.ca, "public-service-ca");
       assert.equal(ssl.rejectUnauthorized, true);
       assert.equal(typeof ssl.checkServerIdentity, "function");
+      assert.equal(pool.options.max, 2);
+      assert.equal(pool.options.idleTimeoutMillis, 10000);
       assert.throws(
         () => databasePool("postgres://pinned.example:5432/db?sslmode=disable"),
         /verify-full/,

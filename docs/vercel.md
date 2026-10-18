@@ -8,7 +8,9 @@ Configure **Production only**, using Secret values for credentials: DATABASE_URL
 
 The service CA can be supplied as base64 in FOLIO_DATABASE_CA_BASE64. DATABASE_URL still requires `sslmode=verify-full`; hostname verification, CA validation and the exact configured certificate fingerprint remain enforced. This replaces a machine-specific certificate filename, not the TLS policy. Never put keys or connection strings in Git or NEXT_PUBLIC_ variables.
 
-Leave APP_URL unset to use Vercel's production URL automatically, or set it to the chosen public origin after assigning a domain. The trusted unique Vercel deployment origin is allowed for same-project requests. OAuth credentials are optional until private Auth0 sign-in is configured; that acceptance step remains pending. Public synthetic demos work independently.
+Leave APP_URL unset to use Vercel's production URL automatically, or set it to the chosen public origin after assigning a domain. Preview deployments use their own VERCEL_URL; register that callback only when deliberately enabling separate preview Auth0 credentials. The trusted unique Vercel deployment origin is allowed for same-project requests. OAuth credentials are optional until private Auth0 sign-in is configured; that acceptance step remains pending. Public synthetic demos work independently.
+
+Hosted database pools use at most two connections per instance and release idle connections after ten seconds. This reduces burst pressure but is not a global connection cap; review Tiger connection capacity before scaling beyond the hackathon demo.
 
 API/PDF functions include the migration SQL and local font assets in their deployment traces. Uploads use memory; CSV maximum 1 MiB, PDF maximum 4 MiB / 10 pages, leaving multipart overhead below Vercel's request limit. The browser rejects oversized files before upload. Shared HTML and API data retain privacy/access headers, and previously issued links retain revocation checks.
 

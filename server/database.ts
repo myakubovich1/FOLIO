@@ -17,7 +17,11 @@ export function verifyPinnedCertificate(
       "Database certificate pin changed; verify the service certificate before deliberately updating the local pin.",
     );
 }
-export function databasePool(connectionString: string, max = 5) {
+export function databasePool(
+  connectionString: string,
+  max = process.env.VERCEL === "1" ? 2 : 5,
+) {
+  const idleTimeoutMillis = process.env.VERCEL === "1" ? 10000 : 30000;
   const url = new URL(connectionString);
   const pinHost = process.env.FOLIO_DATABASE_CERT_HOST;
   const pin = process.env.FOLIO_DATABASE_CERT_SHA256;
@@ -34,7 +38,12 @@ export function databasePool(connectionString: string, max = 5) {
       "The primary database host differs from its configured certificate pin; verify the new service before changing the pin scope.",
     );
   if (!pin || url.host !== pinHost)
-    return new Pool({ connectionString, max, connectionTimeoutMillis: 10000 });
+    return new Pool({
+      connectionString,
+      max,
+      idleTimeoutMillis,
+      connectionTimeoutMillis: 10000,
+    });
   const root = url.searchParams.get("sslrootcert");
   const bundledCa = process.env.FOLIO_DATABASE_CA_BASE64;
   if (
@@ -51,6 +60,7 @@ export function databasePool(connectionString: string, max = 5) {
   return new Pool({
     connectionString: url.toString(),
     max,
+    idleTimeoutMillis,
     connectionTimeoutMillis: 10000,
     ssl: {
       rejectUnauthorized: true,
