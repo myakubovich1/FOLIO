@@ -1,0 +1,9 @@
+# Vercel source checkpoint
+
+Reviewed source: `d62ff778cd52a2979bb8e9d45e3847d3bc162f23`, then fixes at `6b2f5dcbe356c45c97e469559502dbd93eabb225`. Claude Opus 5.5 reviewed immutable Git exports with Read/Glob/Grep only. Initial review: no P0–P2 defects; two P3 findings (preview origin, per-instance pool pressure). Follow-up confirms both repairs with no findings. Exact reports are in reviews/ using those commit hashes.
+
+Codex validation: typecheck, lint, 48 unit/API/database checks with real Tiger enabled, zero skips, and optimized webpack production build passed. Native Next route traces include the SQL migration, three local WOFF files and PDFKit standard-font modules. A real portable CA/base64 database connection returned SELECT 1 with TLS authorized=true while preserving hostname and fingerprint checks.
+
+Native Next desktop/mobile browser suite: 22/24 passed initially; two early desktop startup timeouts (demo session creation and owner fixture explanation interaction) passed unchanged-source targeted rerun in 10.2s and 4.1s. The successful cases cover the borrower journey, correction, deterministic assessment, historical recipient/revocation, PDF download, accessibility/responsiveness and visible provider failures. The owner identity fixture is a test harness, not a real Auth0 tenant. Production browser behavior and actual platform limits require post-deployment checks; this source checkpoint does not certify those.
+
+Auth0 credentials and actual private-account callback remain pending. Multi-instance scale and production provider quotas are unbenchmarked. Vercel deployment evidence will be recorded separately after the GitHub import succeeds.
