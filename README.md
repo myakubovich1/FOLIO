@@ -4,13 +4,13 @@
 
 ![FOLIO borrower journey: bring records, review interpretation, understand and share](docs/images/borrower-journey.png)
 
-[Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png)
+[Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png) · [Evidence flow](docs/images/evidence-explorer.png) · [Mobile flow](docs/images/mobile-evidence-explorer.png) · [Sharing flow](docs/images/sharing-explorer.png)
 
 Screenshots use explicitly synthetic demo records.
 
 ## Visual experience
 
-Original SVG journey illustrations, an assessment index ring, labelled factor bars, and a keyboard/touch cash-flow inspector make the borrower story visible. Graphics use the existing deterministic metrics, separate missing evidence from zero, and preserve passport disclosure choices. See the [graphics checkpoint](docs/checkpoint-graphics.md) for screenshots and independent Opus 5.5 review evidence.
+Three interactive flow explorers explain the borrower journey, trace actual records and corrections into the assessment, and show snapshot/disclosure/sharing boundaries. Ordered keyboard tabs, compact mobile layouts, reduced motion, contextual next steps and link-copy recovery complement the SVG illustrations, index ring and exact monthly cash-flow inspector. Every financial value comes from the existing deterministic contract; missing evidence stays unscored. See the [interactive-flow checkpoint](docs/checkpoint-flows.md) and [financial graphics checkpoint](docs/checkpoint-graphics.md) for checks, screenshots and independent Opus 5.5 review evidence.
 
 ## Core sponsor integrations
 

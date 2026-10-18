@@ -31,3 +31,14 @@ Prepare two isolated US tabs: Alex's saved synthetic profile and a fresh dedicat
 The [official rules](https://swamphacks-xii.devpost.com/rules), checked2026-10-17, list October16–18, an October18 8am EDT deadline,36-hour event development, accepted human teams of2–4 and in-person judging. Supply the description, demo and accessible repository; credit tools/disclose AI assistance. Live demo:3 minutes; video:2 minutes. The team must verify its eligibility and submit. Software agents are not human teammates.
 
 Tiger Data evidence before judging: `npm run verify:persistence` tests two actual production app restarts with the configured cloud database, corrected totals, earlier immutable passport, sessions, expiry/revocation and another-session denial. The saved report avoids spending live demonstration time on restarts. Auth0/private PDF upload remains a separate acceptance step until tenant configuration is supplied. A service-free synthetic flow remains available if providers are unavailable; label that mode explicitly.
+
+## Interactive UX walkthrough (no new provider requests)
+
+1. On the landing page, select the four steps under **Your path from records to possibility.** Keyboard users can use Left/Right, Home and End. The final step can start the selected synthetic demo.
+2. Connect Alex’s saved synthetic records, correct the returned deposit to a transfer, then choose **See assessment**. In **Trace your result**, select Interpretation to see the saved correction count and Assessment to see the actual70 index beside the unscored alternative. Source records and Passport nodes lead directly to those destinations.
+3. Open Overview and use **Prepare your passport**. Expand **Explore the sharing flow**; change optional detail, then select Recipient view. The diagram follows the disclosure choices and server-preview loading/error state. **Inspect recipient preview** opens and focuses the actual preview.
+4. Generate a snapshot; the preview stays open. Create a seven-day link, use **Copy passport link**, then open it in a recipient tab. If clipboard access is unavailable, Folio selects the URL and explains manual copying.
+5. Revoke in Settings and return to the sharing flow: revoked counts change. Recipient JSON and PDF requests now fail. Counts are a snapshot of the latest page update; each server request checks current access.
+6. Repeat with Taylor’s limited evidence: the assessment branch stays unscored, actual gaps are listed, and the recipient diagram says the factor breakdown is unavailable. The optional checkbox does not create missing evidence.
+
+Mobile nodes follow reading order, 1–2 then3–4. Screenshots and exact checkpoint evidence: [interactive flows](checkpoint-flows.md). No new Nessie/Gemini request is made by these explorers.
