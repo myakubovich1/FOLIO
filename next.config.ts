@@ -5,6 +5,9 @@ const config: NextConfig = {
   experimental: { extensionAlias: { ".js": [".ts", ".tsx", ".js"] } },
   reactStrictMode: true,
   serverExternalPackages: ["pg", "pdfkit", "fontkit"],
+  // Vercel's function loader cannot require the SDK's ESM dependencies.
+  // Bundle the SDK and its ESM imports together instead of relying on require(esm).
+  transpilePackages: ["express-openid-connect", "openid-client", "jose"],
   outputFileTracingIncludes: {
     "/api/**": [
       "./migrations/*.sql",
