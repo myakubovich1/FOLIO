@@ -30,7 +30,7 @@ function moveTab(event: KeyboardEvent<HTMLButtonElement>) {
   tabs[next]?.focus();
 }
 
-/** Ordered, inspectable flow: arrow keys follow process order, including on mobile. */
+/** Ordered, inspectable flow: arrow keys follow the same reading order at every size. */
 export function FlowExplorer({
   title,
   intro,

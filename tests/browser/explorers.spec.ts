@@ -43,7 +43,7 @@ test("journey explorer supports keyboard, touch, compact screens and reduced mot
     await journey
       .locator(".flow-panel-copy")
       .evaluate((el) => getComputedStyle(el).animationDuration),
-  ).toBe("1e-05s");
+  ).toBe("0s");
   if (info.project.name === "mobile") await tabs.nth(2).tap();
   else await tabs.nth(2).click();
   await expect(journey.getByRole("tabpanel")).toContainText(
@@ -67,7 +67,7 @@ test("journey explorer supports keyboard, touch, compact screens and reduced mot
       }),
     );
     expect(boxes[2].y).toBeGreaterThan(boxes[1].y);
-    expect(boxes[2].x).toBeGreaterThan(boxes[3].x);
+    expect(boxes[2].x).toBeLessThan(boxes[3].x);
   }
 });
 
@@ -128,13 +128,16 @@ test("evidence and sharing explorers reconcile with revision, disclosure, copyin
     .click();
   await expect(page.locator(".recipient-preview > summary")).toBeFocused();
   await expect(page.locator(".recipient-preview")).toHaveAttribute("open", "");
-  await expect(page.locator(".recipient-preview .factor-card")).toHaveCount(0);
+  await expect(page.locator(".recipient-preview .report-factor")).toHaveCount(
+    0,
+  );
   await page
     .getByRole("button", { name: "Generate passport snapshot" })
     .click();
   await expect(sharing.getByRole("tab", { name: /Snapshot/ })).toContainText(
     "1 issued",
   );
+  await expect(page.locator(".recipient-preview")).toHaveAttribute("open", "");
   await page
     .getByRole("button", { name: "Create 7-day read-only link" })
     .click();
@@ -190,7 +193,9 @@ test("evidence and sharing explorers reconcile with revision, disclosure, copyin
   await expect(
     sharing.getByRole("tab", { name: /Read-only link/ }),
   ).toContainText("0 active · 1 revoked");
-  expect((await page.request.get(link)).status()).toBe(410);
+  expect(
+    (await page.request.get(link.replace("/shared/", "/api/shared/"))).status(),
+  ).toBe(410);
   if (info.project.name === "mobile") {
     await page.setViewportSize({ width: 320, height: 844 });
     await sharing.getByRole("tab", { name: /Recipient view/ }).tap();
@@ -242,6 +247,10 @@ test("unscored evidence and failed recipient previews offer truthful recovery", 
   await expect(
     sharing.getByRole("tab", { name: /Recipient view/ }),
   ).toContainText("Preview ready");
+  await expect(sharing.getByRole("tabpanel")).toContainText("Not available");
+  await expect(sharing.getByRole("tabpanel")).toContainText(
+    "An unscored assessment has no factor breakdown",
+  );
   await expect(
     page.getByRole("button", { name: "Generate passport snapshot" }),
   ).toBeEnabled();

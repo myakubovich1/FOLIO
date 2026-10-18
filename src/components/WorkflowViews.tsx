@@ -329,6 +329,7 @@ export function SharingFlow({
   previewState: "loading" | "ready" | "unavailable";
   onPreview: () => void;
 }) {
+  const factorsAvailable = (state.assessment?.factors.length ?? 0) > 0;
   const now = Date.now();
   const active = state.shares.filter(
     (s) => !s.revoked && Date.parse(s.expiresAt) > now,
@@ -388,8 +389,8 @@ export function SharingFlow({
             </span>
           </div>
           <p className="fine">
-            Every page and PDF request checks the link. Downloaded copies cannot
-            be recalled.
+            Counts reflect the latest page update. Every page and PDF request
+            checks current access. Downloaded copies cannot be recalled.
           </p>
         </>
       ),
@@ -410,7 +411,13 @@ export function SharingFlow({
             <span>
               <Icon name="trend" />
               Factor breakdown
-              <strong>{factors ? "Included" : "Excluded"}</strong>
+              <strong>
+                {!factors
+                  ? "Excluded"
+                  : factorsAvailable
+                    ? "Included"
+                    : "Not available"}
+              </strong>
             </span>
             <span>
               <Icon name="income" />
@@ -418,6 +425,12 @@ export function SharingFlow({
               <strong>{cashflow ? "Included" : "Excluded"}</strong>
             </span>
           </div>
+          {factors && !factorsAvailable && (
+            <p className="fine">
+              An unscored assessment has no factor breakdown. Selecting this
+              option does not create one.
+            </p>
+          )}
           <p className="fine">
             These choices describe the next snapshot. Inspect the actual
             recipient preview before issuing it.

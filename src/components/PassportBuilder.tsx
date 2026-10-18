@@ -10,7 +10,9 @@ export function PassportBuilder({
   state: State;
   onState: (s: State) => void;
 }) {
-  const previewRef = useRef<HTMLDetailsElement>(null);
+  const [previewOpen, setPreviewOpen] = useState(
+    () => state.passports.length === 0,
+  );
   const previewSummaryRef = useRef<HTMLElement>(null);
   const [copyMessage, setCopyMessage] = useState<{
     shareId: string;
@@ -145,8 +147,8 @@ export function PassportBuilder({
           days={days}
           previewState={loading ? "loading" : preview ? "ready" : "unavailable"}
           onPreview={() => {
-            if (!previewRef.current || !previewSummaryRef.current) return;
-            previewRef.current.open = true;
+            if (!previewSummaryRef.current) return;
+            setPreviewOpen(true);
             previewSummaryRef.current.focus({ preventScroll: true });
             previewSummaryRef.current.scrollIntoView({
               block: "start",
@@ -162,9 +164,9 @@ export function PassportBuilder({
       ) : (
         preview && (
           <details
-            ref={previewRef}
             className="recipient-preview"
-            open={state.passports.length === 0}
+            open={previewOpen}
+            onToggle={(event) => setPreviewOpen(event.currentTarget.open)}
           >
             <summary ref={previewSummaryRef}>
               Recipient preview · current revision {state.revision}
