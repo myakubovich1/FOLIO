@@ -4,7 +4,7 @@
 
 ![FOLIO borrower journey: bring records, review interpretation, understand and share](docs/images/borrower-journey.png)
 
-[Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png) · [Evidence flow](docs/images/evidence-explorer.png) · [Mobile flow](docs/images/mobile-evidence-explorer.png) · [Sharing flow](docs/images/sharing-explorer.png) · [Belarus demo](docs/images/belarus-assessment.png)
+[Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png) · [Evidence flow](docs/images/evidence-explorer.png) · [Mobile flow](docs/images/mobile-evidence-explorer.png) · [PDF export](docs/checkpoint-polish.md) · [Belarus demo](docs/images/belarus-assessment.png)
 
 Screenshots use explicitly synthetic demo records. Current demonstration markets: **United States / USD** and **Belarus / BYN**. Belarus examples use synthetic local-currency fixtures; Nessie remains a USD sandbox. See the [Belarus market checkpoint](docs/checkpoint-belarus.md) for exact amounts and verification.
 
@@ -91,3 +91,5 @@ Auth0 configuration is pending: actual two-account login/callback/logout and pri
 [Architecture](docs/architecture.md) · [assessment contract](docs/assessment.md) · [imports](docs/imports.md) · [evaluation](docs/evaluation.md) · [visual specification](docs/visual-spec.md) · [deployment](docs/deployment.md) · [credits](docs/sponsor-map.md)
 
 The current passport interface exports PDFs. At the user’s request, link creation, link lifetime and URL-copy controls have been removed. Existing issued links keep their original access checks and remain manageable in Settings. Historical checkpoint documents describe the interface at their recorded commits.
+
+Latest visual update: [distinct review and assessment illustrations, PDF-export controls and checks](docs/checkpoint-polish.md).
