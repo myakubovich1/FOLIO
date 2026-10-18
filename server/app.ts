@@ -222,7 +222,7 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
     if (!snapshot) {
       res.status(410).json({
         error:
-          "This passport link is expired, revoked or unavailable. Ask its owner for a new link.",
+          "This passport link is expired, revoked or unavailable. Ask its owner to send you the passport PDF directly.",
       });
       return;
     }
@@ -233,7 +233,7 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
     if (!snapshot) {
       res.status(410).json({
         error:
-          "This passport link is expired, revoked or unavailable. Ask its owner for a new link.",
+          "This passport link is expired, revoked or unavailable. Ask its owner to send you the passport PDF directly.",
       });
       return;
     }
@@ -280,12 +280,10 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
       state.mode === "demo" &&
       !["USD", "BYN"].includes(state.borrower.currency)
     ) {
-      res
-        .status(409)
-        .json({
-          error:
-            "This saved demo uses a retired market. Choose a fresh Belarus or United States profile. Your earlier issued passports remain unchanged.",
-        });
+      res.status(409).json({
+        error:
+          "This saved demo uses a retired market. Choose a fresh Belarus or United States profile. Your earlier issued passports remain unchanged.",
+      });
       return;
     }
     if (state.assessment && !state.assessment.monthly) {

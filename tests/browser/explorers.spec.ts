@@ -39,6 +39,9 @@ test("journey explorer supports keyboard, touch, compact screens and reduced mot
   await expect(journey.getByRole("tabpanel")).toContainText(
     "original record stays intact",
   );
+  const reviewDrawing = await journey
+    .locator(".journey-art > svg")
+    .evaluate((el) => el.innerHTML);
   expect(
     await journey
       .locator(".flow-panel-copy")
@@ -49,6 +52,10 @@ test("journey explorer supports keyboard, touch, compact screens and reduced mot
   await expect(journey.getByRole("tabpanel")).toContainText(
     "instead of assigning a zero",
   );
+  const assessmentDrawing = await journey
+    .locator(".journey-art > svg")
+    .evaluate((el) => el.innerHTML);
+  expect(assessmentDrawing).not.toBe(reviewDrawing);
   const results = await new AxeBuilder({ page })
     .include("#how-it-works")
     .analyze();

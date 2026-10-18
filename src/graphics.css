@@ -441,3 +441,9 @@
     grid-template-columns: 36px minmax(0, 1fr);
   }
 }
+
+.illustrated-step-assessment .journey-art {
+  --art-accent: #cbdde9;
+  --art-paper: #eaf1f6;
+  background: #eaf1f6;
+}

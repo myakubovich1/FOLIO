@@ -40,10 +40,16 @@ export function IndexVisual({
 export function JourneyArt({
   kind,
 }: {
-  kind: "records" | "review" | "passport";
+  kind: "records" | "review" | "assessment" | "passport";
 }) {
   return (
-    <svg viewBox="0 0 320 190" fill="none" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 320 190"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+      data-illustration={kind}
+    >
       {kind === "records" ? (
         <>
           <circle cx="164" cy="96" r="75" fill="var(--art-accent)" />
@@ -155,13 +161,72 @@ export function JourneyArt({
             strokeWidth="2"
           />
           <path
-            d="M250 126v17m-6-6 6 6 6-6m3-12v10"
+            d="m245 141 3-10 10-10 7 7-10 10-10 3Zm5-12 7 7m-10 0 3 3"
             stroke="var(--forest)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path d="m140 28 3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="var(--forest)" />
+        </>
+      ) : kind === "assessment" ? (
+        <>
+          <circle cx="160" cy="94" r="78" fill="var(--art-accent)" />
+          {[46, 124, 202].map((x) => (
+            <g key={x}>
+              <rect
+                x={x}
+                y="38"
+                width="66"
+                height="99"
+                rx="14"
+                fill="var(--white)"
+                stroke="var(--forest)"
+                strokeWidth="1.5"
+              />
+              <path
+                d={`M${x + 17} 104h32M${x + 17} 115h21`}
+                stroke="var(--forest)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                opacity=".45"
+              />
+            </g>
+          ))}
+          <g
+            stroke="var(--forest)"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m70 83 18-20" />
+            <circle cx="70" cy="66" r="4" />
+            <circle cx="88" cy="81" r="4" />
+            <ellipse cx="157" cy="64" rx="14" ry="5" />
+            <path d="M143 64v10c0 7 28 7 28 0V64M143 74v10c0 7 28 7 28 0V74" />
+            <path d="M222 76a13 13 0 0 1 24-7m1 8a13 13 0 0 1-24 7" />
+            <circle cx="222" cy="76" r="2" fill="var(--forest)" />
+            <circle cx="247" cy="77" r="2" fill="var(--forest)" />
+          </g>
+          <path
+            d="M79 138v15h156v-15M157 138v15"
+            stroke="var(--forest)"
+            strokeWidth="1.5"
+          />
+          <rect
+            x="119"
+            y="145"
+            width="76"
+            height="28"
+            rx="14"
+            fill="var(--forest)"
+          />
+          <path
+            d="M137 156h40m-33 7h26"
+            stroke="var(--green)"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
         </>
       ) : (
         <>

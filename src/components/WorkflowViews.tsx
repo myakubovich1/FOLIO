@@ -11,7 +11,7 @@ export function JourneyExplorer({
   busy: boolean;
 }) {
   const detail = (
-    kind: "records" | "review" | "passport",
+    kind: "records" | "review" | "assessment" | "passport",
     copy: string,
     note: string,
   ) => (
@@ -56,7 +56,7 @@ export function JourneyExplorer({
       icon: "trend",
       status: "Evidence before an index",
       detail: detail(
-        "review",
+        "assessment",
         "Follow the recorded income, expenses and balance evidence into three fixed factors. If required evidence is missing, Folio explains the gap instead of assigning a zero.",
         "An experimental index is not an approval, a loan limit or a repayment probability.",
       ),
