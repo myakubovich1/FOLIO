@@ -12,3 +12,5 @@ In-progress checkpoints: first migrate shell/storage and authentication boundari
 Checks: unit financial/ingestion tests, owner/demo/recipient isolation, expiry/revocation including PDFs, invalid AI evidence/numbers/injection tests, desktop/mobile/keyboard browser flows, PDF render inspection, lint/typecheck/build. Record exact reviewed commits, findings/dispositions and verified/externally blocked outcomes under reviews/ and docs/.
 
 Current demonstration markets are United States/USD and Belarus/BYN, per the user’s explicit market change. Belarus examples are synthetic local-currency fixtures, not an FX conversion or a live Belarusian banking integration. Preserve issued snapshots and historical review evidence.
+
+Current user override: remove public-link creation from the passport UI, including lifetime/copy controls. Current borrower sharing uses downloaded PDFs. Preserve existing issued links and their revocation/access checks; do not advertise new link creation in the UI.

@@ -1,6 +1,6 @@
 # FOLIO
 
-**Credit beyond your credit history.** Permissioned financial records → review and correction → deterministic alternative assessment → portable financial passport → expiring sharing and revocation. An existing credit score is not required. This experimental scorecard is not a lending decision, repayment prediction, or promise of lender acceptance.
+**Credit beyond your credit history.** Permissioned financial records → review and correction → deterministic alternative assessment → portable financial passport → PDF export. Previously issued links retain expiry and revocation. An existing credit score is not required. This experimental scorecard is not a lending decision, repayment prediction, or promise of lender acceptance.
 
 ![FOLIO borrower journey: bring records, review interpretation, understand and share](docs/images/borrower-journey.png)
 
@@ -10,7 +10,7 @@ Screenshots use explicitly synthetic demo records. Current demonstration markets
 
 ## Visual experience
 
-Three interactive flow explorers explain the borrower journey, trace actual records and corrections into the assessment, and show snapshot/disclosure/sharing boundaries. Ordered keyboard tabs, compact mobile layouts, reduced motion, contextual next steps and link-copy recovery complement the SVG illustrations, index ring and exact monthly cash-flow inspector. Every financial value comes from the existing deterministic contract; missing evidence stays unscored. See the [interactive-flow checkpoint](docs/checkpoint-flows.md) and [financial graphics checkpoint](docs/checkpoint-graphics.md) for checks, screenshots and independent Opus 5.5 review evidence.
+Three interactive flow explorers explain the borrower journey, trace actual records and corrections into the assessment, and show snapshot/disclosure/sharing boundaries. Ordered keyboard tabs, compact mobile layouts, reduced motion, contextual next steps and PDF export complement the SVG illustrations, index ring and exact monthly cash-flow inspector. Every financial value comes from the existing deterministic contract; missing evidence stays unscored. See the [interactive-flow checkpoint](docs/checkpoint-flows.md) and [financial graphics checkpoint](docs/checkpoint-graphics.md) for checks, screenshots and independent Opus 5.5 review evidence.
 
 ## Core sponsor integrations
 
@@ -89,3 +89,5 @@ The process-local override uses the existing Claude Pro login. A simultaneous se
 Auth0 configuration is pending: actual two-account login/callback/logout and private upload acceptance cannot be certified by the isolated test-identity harness. A public HTTPS deployment, public repository URL, human team eligibility and Devpost submission also remain operator steps. Provider limits and latency can affect live rehearsal; calculated explanations remain explicitly available. No empirical repayment accuracy or complete WCAG certification is claimed.
 
 [Architecture](docs/architecture.md) · [assessment contract](docs/assessment.md) · [imports](docs/imports.md) · [evaluation](docs/evaluation.md) · [visual specification](docs/visual-spec.md) · [deployment](docs/deployment.md) · [credits](docs/sponsor-map.md)
+
+The current passport interface exports PDFs. At the user’s request, link creation, link lifetime and URL-copy controls have been removed. Existing issued links keep their original access checks and remain manageable in Settings. Historical checkpoint documents describe the interface at their recorded commits.

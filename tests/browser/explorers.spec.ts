@@ -71,7 +71,7 @@ test("journey explorer supports keyboard, touch, compact screens and reduced mot
   }
 });
 
-test("evidence and sharing explorers reconcile with revision, disclosure, copying and revocation", async ({
+test("evidence and sharing explorers reconcile with revision, disclosure and PDF export", async ({
   page,
 }, info) => {
   await connect(page);
@@ -138,64 +138,19 @@ test("evidence and sharing explorers reconcile with revision, disclosure, copyin
     "1 issued",
   );
   await expect(page.locator(".recipient-preview")).toHaveAttribute("open", "");
-  await page
-    .getByRole("button", { name: "Create 7-day read-only link" })
-    .click();
   await expect(
-    sharing.getByRole("tab", { name: /Read-only link/ }),
-  ).toContainText("1 active · 0 revoked");
-  const link = await page.getByLabel("New passport link").inputValue();
-  // Deterministic clipboard stub checks the exact URL without OS permissions or outputting the token.
-  await page.evaluate(() =>
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: {
-        writeText: async (value: string) => {
-          (window as unknown as { copied: string }).copied = value;
-        },
-      },
-    }),
-  );
-  await page.getByRole("button", { name: "Copy passport link" }).click();
-  await expect(page.getByRole("status")).toContainText("Link copied");
-  expect(
-    await page.evaluate(() => (window as unknown as { copied: string }).copied),
-  ).toBe(link);
-  await page.evaluate(() =>
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: {
-        writeText: async () => {
-          throw new Error("Clipboard unavailable");
-        },
-      },
-    }),
-  );
-  await page.getByRole("button", { name: "Copy passport link" }).click();
-  await expect(page.getByLabel("New passport link")).toBeFocused();
-  await expect(page.getByRole("status")).toContainText("copy it manually");
-  expect(
-    await page
-      .getByLabel("New passport link")
-      .evaluate(
-        (el: HTMLInputElement) =>
-          el.selectionEnd === el.value.length && el.selectionStart === 0,
-      ),
-  ).toBe(true);
-  await sharing.getByRole("tab", { name: /Read-only link/ }).click();
+    page.getByRole("button", { name: /Create .*read-only link/ }),
+  ).toHaveCount(0);
+  await expect(page.getByLabel("New link lifetime")).toHaveCount(0);
+  await expect(page.getByLabel("New passport link")).toHaveCount(0);
+  await sharing.getByRole("tab", { name: /PDF export/ }).click();
   await expect(sharing.getByRole("tabpanel")).toContainText(
     "Downloaded copies cannot be recalled",
   );
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
-  await page.getByRole("button", { name: "Revoke link", exact: true }).click();
-  await page.getByRole("button", { name: "Report", exact: true }).click();
-  await page.getByText("Explore the sharing flow", { exact: true }).click();
-  await expect(
-    sharing.getByRole("tab", { name: /Read-only link/ }),
-  ).toContainText("0 active · 1 revoked");
-  expect(
-    (await page.request.get(link.replace("/shared/", "/api/shared/"))).status(),
-  ).toBe(410);
+  const downloadEvent = page.waitForEvent("download");
+  await page.getByRole("link", { name: "Download passport PDF ↓" }).click();
+  const download = await downloadEvent;
+  expect(await download.failure()).toBeNull();
   if (info.project.name === "mobile") {
     await page.setViewportSize({ width: 320, height: 844 });
     await sharing.getByRole("tab", { name: /Recipient view/ }).tap();

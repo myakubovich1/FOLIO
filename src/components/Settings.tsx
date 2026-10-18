@@ -98,14 +98,15 @@ export function Settings({
           <p>No sources yet. Add records to begin.</p>
         )}
       </section>
-      <section className="card">
-        <h2>Active and revoked links</h2>
-        <p>
-          Every visit and PDF request checks expiry and revocation. Revoking a
-          link cannot recall a downloaded copy.
-        </p>
-        {state.shares.length ? (
-          state.shares.map((s) => {
+      {state.shares.length > 0 && (
+        <section className="card">
+          <h2>Previously issued links</h2>
+          <p>
+            Manage existing links here. Every visit and PDF request checks
+            expiry and revocation. Revoking a link cannot recall a downloaded
+            copy.
+          </p>
+          {state.shares.map((s) => {
             const p = state.passports.find((p) => p.id === s.passportId);
             return (
               <div className="factor" key={s.id}>
@@ -132,16 +133,9 @@ export function Settings({
                 </button>
               </div>
             );
-          })
-        ) : (
-          <div className="empty">
-            <p>
-              No links yet. Generate a passport in Report, preview it, then
-              create a link.
-            </p>
-          </div>
-        )}
-      </section>
+          })}
+        </section>
+      )}
       <section className="card">
         <h2>Data and integration status</h2>
         <p>

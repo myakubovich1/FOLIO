@@ -450,9 +450,9 @@ function Landing({
         </div>
         <div>
           <p>
-            Links expire and can be revoked. A downloaded PDF cannot be
-            recalled. Raw merchant histories and account identifiers stay out of
-            the financial passport.
+            Download a PDF with the details you choose. A downloaded file cannot
+            be recalled. Raw merchant histories and account identifiers stay out
+            of the financial passport.
           </p>
           <button className="primary" onClick={onAccount}>
             Build your profile ↗
@@ -711,9 +711,9 @@ function App() {
               </p>
               <p>
                 Recipients see the selected immutable report, never your live
-                account. Links are opaque, expire and can be revoked. Every
-                service visit and PDF download checks access. Revocation cannot
-                recall downloaded copies.
+                account. Previously issued links are opaque, expire and can be
+                revoked. Every service visit and PDF download checks access.
+                Revocation cannot recall downloaded copies.
               </p>
               <p>
                 Workspace deletion removes application records, derived

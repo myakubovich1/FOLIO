@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { legacyShare } from "./legacy-shares";
 import AxeBuilder from "@axe-core/playwright";
 import { sampleCsv } from "../../server/imports.js";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -98,10 +99,7 @@ test("private owner upload, correction, explanation, disclosure, PDF and deletio
   await page
     .getByRole("button", { name: "Generate passport snapshot" })
     .click();
-  await page
-    .getByRole("button", { name: "Create 7-day read-only link" })
-    .click();
-  const url = await page.getByLabel(/New passport link/).inputValue();
+  const url = (await legacyShare(page)).url;
   const clean = await browser.newContext();
   const recipient = await clean.newPage();
   await recipient.goto(url);
@@ -227,10 +225,7 @@ test("responsive visual and accessibility pass", async ({ page }, info) => {
   await page
     .getByRole("button", { name: "Generate passport snapshot" })
     .click();
-  await page
-    .getByRole("button", { name: "Create 7-day read-only link" })
-    .click();
-  const link = await page.getByLabel(/New passport link/).inputValue();
+  const link = (await legacyShare(page)).url;
   await page.goto(link);
   await expect(
     page.getByRole("heading", { name: "Folio Credit Index" }),

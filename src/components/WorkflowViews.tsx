@@ -65,10 +65,10 @@ export function JourneyExplorer({
       id: "passport",
       label: "Share selectively",
       icon: "report",
-      status: "Expiry and revocation",
+      status: "Preview, then export",
       detail: detail(
         "passport",
-        "Preview a limited financial passport, choose optional detail and issue an immutable snapshot. Share it using a read-only link you can expire or revoke.",
+        "Preview a limited financial passport, choose optional detail and issue an immutable snapshot. Download the PDF and choose where to share the file.",
         "Raw records and account identifiers stay out. Copies already downloaded cannot be recalled.",
       ),
       action: (
@@ -318,23 +318,16 @@ export function SharingFlow({
   state,
   factors,
   cashflow,
-  days,
   previewState,
   onPreview,
 }: {
   state: State;
   factors: boolean;
   cashflow: boolean;
-  days: number;
   previewState: "loading" | "ready" | "unavailable";
   onPreview: () => void;
 }) {
   const factorsAvailable = (state.assessment?.factors.length ?? 0) > 0;
-  const now = Date.now();
-  const active = state.shares.filter(
-    (s) => !s.revoked && Date.parse(s.expiresAt) > now,
-  ).length;
-  const revoked = state.shares.filter((s) => s.revoked).length;
   const steps: FlowStep[] = [
     {
       id: "workspace",
@@ -369,28 +362,21 @@ export function SharingFlow({
       ),
     },
     {
-      id: "link",
-      label: "Read-only link",
-      icon: "arrow",
-      status: `${active} active · ${revoked} revoked`,
+      id: "export",
+      label: "PDF export",
+      icon: "report",
+      status: state.passports.length
+        ? "Ready for issued snapshots"
+        : "Issue a snapshot first",
       detail: (
         <>
           <p>
-            New links use the selected <strong>{days}-day lifetime</strong>. The
-            counts above cover all issued passports in this workspace; expired
-            links are not counted as active.
+            Generate a snapshot, then use its Download passport PDF action. The
+            file preserves that snapshot’s revision and disclosure choices.
           </p>
-          <div className="sharing-branches">
-            <span>
-              <Icon name="arrow" /> Active and unexpired → recipient access
-            </span>
-            <span>
-              <Icon name="settings" /> Revoked or expired → future access denied
-            </span>
-          </div>
           <p className="fine">
-            Counts reflect the latest page update. Every page and PDF request
-            checks current access. Downloaded copies cannot be recalled.
+            Choose where to share the downloaded file. Downloaded copies cannot
+            be recalled or revoked through Folio.
           </p>
         </>
       ),
@@ -451,7 +437,7 @@ export function SharingFlow({
   return (
     <FlowExplorer
       title="See how sharing works."
-      intro="Explore what stays private, what freezes in a snapshot and how access ends."
+      intro="Explore what stays private, what freezes in a snapshot and what a recipient sees in the exported file."
       steps={steps}
     />
   );

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { legacyShare } from "./legacy-shares";
 test.beforeEach(async ({ page }) => {
   page.on("console", (m) => {
     if (m.type() === "error" && !m.text().includes("Failed to load resource"))
@@ -142,15 +143,13 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
   await page
     .getByRole("button", { name: "Generate passport snapshot" })
     .click();
-  await page
-    .getByRole("button", { name: "Create 7-day read-only link" })
-    .click();
-  const link = await page.getByLabel("New passport link").inputValue();
-  await page
-    .getByRole("button", { name: "Create 7-day read-only link" })
-    .click();
-  await expect(page.getByLabel("New passport link")).toHaveCount(2);
-  await expect(page.getByLabel("New passport link").last()).toHaveValue(link);
+  await expect(
+    page.getByRole("button", { name: /Create .*read-only link/ }),
+  ).toHaveCount(0);
+  const link = (await legacyShare(page)).url;
+  const secondShare = await legacyShare(page);
+  expect(secondShare.state.shares).toHaveLength(2);
+  await page.reload();
   const recipient = await context.newPage();
   const sharedHtml = await recipient.goto(link);
   expect(sharedHtml!.headers()["cache-control"]).toBe("no-store");

@@ -14,16 +14,10 @@ export function PassportBuilder({
     () => state.passports.length === 0,
   );
   const previewSummaryRef = useRef<HTMLElement>(null);
-  const [copyMessage, setCopyMessage] = useState<{
-    shareId: string;
-    text: string;
-  } | null>(null);
   const [previewAttempt, setPreviewAttempt] = useState(0);
   const [factors, setFactors] = useState(true),
     [cashflow, setCashflow] = useState(true),
     [preview, setPreview] = useState<Passport | null>(null),
-    [days, setDays] = useState(7),
-    [urls, setUrls] = useState<Record<string, string>>({}),
     [busy, setBusy] = useState(false),
     [loading, setLoading] = useState(true),
     [error, setError] = useState("");
@@ -121,22 +115,6 @@ export function PassportBuilder({
         >
           Generate passport snapshot
         </button>
-        <label htmlFor="share-days">New link lifetime</label>
-        <select
-          id="share-days"
-          disabled={busy}
-          value={days}
-          onChange={(e) => setDays(Number(e.target.value))}
-        >
-          <option value={1}>1 day</option>
-          <option value={7}>7 days (recommended)</option>
-          <option value={30}>30 days</option>
-        </select>
-        <p className="fine">
-          Every access checks expiry and revocation, including PDF downloads.
-          Revocation stops future access through Folio; it cannot recall a copy
-          someone already downloaded.
-        </p>
       </section>
       <details className="card sharing-flow">
         <summary>Explore the sharing flow</summary>
@@ -144,7 +122,6 @@ export function PassportBuilder({
           state={state}
           factors={factors}
           cashflow={cashflow}
-          days={days}
           previewState={loading ? "loading" : preview ? "ready" : "unavailable"}
           onPreview={() => {
             if (!previewSummaryRef.current) return;
@@ -196,98 +173,7 @@ export function PassportBuilder({
             >
               Download passport PDF ↓
             </a>
-            <button
-              disabled={busy}
-              className="primary"
-              onClick={() =>
-                run(async () => {
-                  const r = await api<{ state: State; token: string }>(
-                    "shares",
-                    "POST",
-                    { passportId: p.id, days },
-                  );
-                  onState(r.state);
-                  setCopyMessage(null);
-                  setUrls((old) => ({
-                    ...old,
-                    [r.state.shares[0].id]:
-                      `${location.origin}/shared/${r.token}`,
-                  }));
-                })
-              }
-            >
-              Create {days}-day read-only link
-            </button>
           </div>
-          {state.shares
-            .filter((s) => s.passportId === p.id && urls[s.id])
-            .map((s) => (
-              <section className="card share-result" key={s.id}>
-                <label htmlFor={`share-${s.id}`}>
-                  New passport link · revision {p.assessment.revision} · copy
-                  before refresh
-                </label>
-                <input
-                  id={`share-${s.id}`}
-                  value={urls[s.id]}
-                  readOnly
-                  onFocus={(e) => e.target.select()}
-                />
-                <small>
-                  Link {s.id.slice(0, 6)} · expires {displayDate(s.expiresAt)}
-                </small>
-                {s.revoked || !(Date.parse(s.expiresAt) > Date.now()) ? (
-                  <p>{s.revoked ? "Revoked" : "Expired or unavailable"}</p>
-                ) : (
-                  <div className="share-link-actions">
-                    <button
-                      className="secondary"
-                      onClick={async () => {
-                        if (!(Date.parse(s.expiresAt) > Date.now())) {
-                          setCopyMessage({
-                            shareId: s.id,
-                            text: "This link has expired. Create a new link.",
-                          });
-                          return;
-                        }
-                        try {
-                          await navigator.clipboard.writeText(urls[s.id]);
-                          setCopyMessage({
-                            shareId: s.id,
-                            text: "Link copied. Share it only with the intended recipient.",
-                          });
-                        } catch {
-                          const input = document.getElementById(
-                            `share-${s.id}`,
-                          ) as HTMLInputElement | null;
-                          input?.focus();
-                          input?.select();
-                          setCopyMessage({
-                            shareId: s.id,
-                            text: "Automatic copy is unavailable. The link is selected; copy it manually.",
-                          });
-                        }
-                      }}
-                    >
-                      Copy passport link
-                    </button>
-                    <a
-                      className="text-link"
-                      href={urls[s.id]}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open recipient preview ↗
-                    </a>
-                  </div>
-                )}
-                {copyMessage?.shareId === s.id && (
-                  <p className="fine" role="status">
-                    {copyMessage.text}
-                  </p>
-                )}
-              </section>
-            ))}
         </section>
       ))}
     </>

@@ -304,16 +304,6 @@
   width: 20px;
   height: 20px;
 }
-.share-link-actions {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
-.share-link-actions .text-link {
-  margin: 0;
-}
 @keyframes flow-enter {
   from {
     transform: translateY(4px);
