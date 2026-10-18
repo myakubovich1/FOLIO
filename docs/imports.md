@@ -1,6 +1,6 @@
 # Import format and correction
 
-Download an exact synthetic example from Records → Upload statement; files are also in samples/. A public demo accepts only these exact generated samples. Private owners can upload their own CSV/PDF after authentication and informed consent. PDF extraction requires configured Gemini and explicit provider permission. CSV maximum1MB/5,000rows; PDF maximum5MB/10pages. No raw file is saved to disk by the application.
+Download an exact synthetic example from Records → Upload statement; files are also in samples/. A public demo accepts only these exact generated samples. Private owners can upload their own CSV/PDF after authentication and informed consent. PDF extraction requires configured Gemini and explicit provider permission. CSV maximum1MB/5,000rows; PDF maximum4MB/10pages. No raw file is saved to disk by the application.
 
 CSV uses signed major-unit decimal amounts (e.g. -10.05), exactly two decimal places at most, no exponent/thousands separators; server stores integer cents/minor units. One account alias and supported USD/BYN currency per file. Never enter a full account number as the alias. Stable id is required across overlapping exports. Required row fields: id,date,amount,currency,category,description,account_id. Dates must be real YYYY-MM-DD inside the end-exclusive coverage period. Categories: income,expense,transfer,borrowing,refund,unknown. Missing/unsupported categories stay unknown and must be reviewed. Withdrawals are deliberately unknown until cash purpose is confirmed.
 

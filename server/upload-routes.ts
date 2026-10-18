@@ -9,7 +9,7 @@ import { assess } from "./assessment.js";
 import { extractStatement } from "./gemini.js";
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 3 },
+  limits: { fileSize: 4 * 1024 * 1024, files: 1, fields: 3 },
 });
 export function registerUploads(app: Express, store: Store) {
   app.post("/api/uploads/preview", upload.single("file"), async (req, res) => {
@@ -22,7 +22,7 @@ export function registerUploads(app: Express, store: Store) {
     if (!req.file) {
       res.status(400).json({
         error:
-          "Choose a CSV file up to 1 MB, or a PDF statement up to 5 MB and 10 pages.",
+          "Choose a CSV file up to 1 MB, or a PDF statement up to 4 MB and 10 pages.",
       });
       return;
     }
@@ -70,7 +70,7 @@ export function registerUploads(app: Express, store: Store) {
       ) {
         res.status(400).json({
           error:
-            "Choose a CSV file up to 1 MB, or a PDF up to 5 MB and 10 pages.",
+            "Choose a CSV file up to 1 MB, or a PDF up to 4 MB and 10 pages.",
         });
         return;
       }

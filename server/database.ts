@@ -36,8 +36,9 @@ export function databasePool(connectionString: string, max = 5) {
   if (!pin || url.host !== pinHost)
     return new Pool({ connectionString, max, connectionTimeoutMillis: 10000 });
   const root = url.searchParams.get("sslrootcert");
+  const bundledCa = process.env.FOLIO_DATABASE_CA_BASE64;
   if (
-    !root ||
+    (!root && !bundledCa) ||
     url.searchParams.get("sslmode") !== "verify-full" ||
     url.searchParams.has("sslcert") ||
     url.searchParams.has("sslkey")
@@ -53,7 +54,9 @@ export function databasePool(connectionString: string, max = 5) {
     connectionTimeoutMillis: 10000,
     ssl: {
       rejectUnauthorized: true,
-      ca: readFileSync(root, "utf8"),
+      ca: bundledCa
+        ? Buffer.from(bundledCa, "base64").toString("utf8")
+        : readFileSync(root!, "utf8"),
       checkServerIdentity: (host, cert) =>
         verifyPinnedCertificate(host, cert, pin),
     },

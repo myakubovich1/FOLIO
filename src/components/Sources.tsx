@@ -159,7 +159,7 @@ export function Sources({
         <div className="source-body">
           <h3>A statement you can inspect.</h3>
           <p>
-            CSV: up to 1 MB and 5,000 rows. PDF: up to 5 MB and 10 pages, with
+            CSV: up to 1 MB and 5,000 rows. PDF: up to 4 MB and 10 pages, with
             Gemini extraction. Use one currency and one account alias per file.
             Balances and complete coverage are checked rather than assumed.
           </p>
@@ -183,7 +183,17 @@ export function Sources({
             type="file"
             accept=".csv,.pdf,text/csv,application/pdf"
             onChange={(e) => {
-              setFile(e.target.files?.[0] || null);
+              const selected = e.target.files?.[0] || null;
+              const limit = selected?.name.toLowerCase().endsWith(".csv")
+                ? 1024 * 1024
+                : 4 * 1024 * 1024;
+              if (selected && selected.size > limit) {
+                setFile(null);
+                setError("Choose a CSV up to 1 MB or a PDF up to 4 MB.");
+              } else {
+                setFile(selected);
+                setError("");
+              }
               setPreview(null);
               setReviewed(false);
             }}

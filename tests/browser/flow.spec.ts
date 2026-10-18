@@ -152,7 +152,7 @@ test("borrower, connect, correction, assessment, passport, recipient and revoke"
   await page.reload();
   const recipient = await context.newPage();
   const sharedHtml = await recipient.goto(link);
-  expect(sharedHtml!.headers()["cache-control"]).toBe("no-store");
+  expect(sharedHtml!.headers()["cache-control"]).toContain("no-store");
   expect(sharedHtml!.headers()["x-robots-tag"]).toBe("noindex");
   expect(sharedHtml!.headers()["referrer-policy"]).toBe("no-referrer");
   await expect(

@@ -3,6 +3,7 @@ import onHeaders from "on-headers";
 import { auth } from "express-openid-connect";
 import { randomBytes, createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
+import { MulterError } from "multer";
 import { Store, CleanupPendingError } from "./store.js";
 import { registerNessie } from "./nessie-routes.js";
 import { registerAI } from "./ai-routes.js";
@@ -96,6 +97,8 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
   });
   app.use(express.json({ limit: "256kb" }));
   const allowedOrigins = new Set([new URL(appUrl()).origin]);
+  if (process.env.VERCEL === "1" && process.env.VERCEL_URL)
+    allowedOrigins.add(new URL(`https://${process.env.VERCEL_URL}`).origin);
   if (
     process.env.NODE_ENV !== "production" &&
     ["localhost", "127.0.0.1"].includes(new URL(appUrl()).hostname)
@@ -593,6 +596,12 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
     ) => {
       if (error instanceof CleanupPendingError) {
         res.status(503).json({ error: error.message });
+        return;
+      }
+      if (error instanceof MulterError && error.code === "LIMIT_FILE_SIZE") {
+        res
+          .status(413)
+          .json({ error: "Choose a CSV up to 1 MB or a PDF up to 4 MB." });
         return;
       }
       const validation = error instanceof z.ZodError;
