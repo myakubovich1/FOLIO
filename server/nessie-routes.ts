@@ -22,7 +22,7 @@ export function registerNessie(app: Express, store: Store) {
     if (state.borrower.currency !== "USD") {
       res.status(400).json({
         error:
-          "Nessie is a USD banking simulation. Use a USD profile; it cannot be relabeled as Kenyan mobile-money data.",
+          "Nessie is a USD banking simulation. Use a USD profile; it cannot be relabeled as Belarusian bank data.",
       });
       return;
     }

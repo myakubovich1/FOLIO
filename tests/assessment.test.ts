@@ -29,10 +29,10 @@ test("currency scaling and identity labels do not affect ratios", () => {
   const original = assess(b);
   b.name = "Different";
   b.context = "Different nationality, occupation and market";
-  b.currency = "KES";
+  b.currency = "BYN";
   b.records.forEach((r) => {
     r.amount *= 100;
-    r.currency = "KES";
+    r.currency = "BYN";
   });
   b.minimumBalance! *= 100;
   b.closingBalance! *= 100;

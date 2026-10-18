@@ -10,7 +10,7 @@
 ## Completed implementation and independent review
 1. `69c92bd`: synthetic borrower → source consent → review → assessment → financial passport → share/revoke flow.
 2. `1236f39`: stabilized review handoff and corrected the browser test's post-correction expected score.
-3. Claude completed its independent review in session `33d706ac-39d4-4e9d-85ef-3495030aae36`. Its actual final response is preserved verbatim in [1236f394-review.md](1236f394-review.md). Claude manually reproduced the newcomer score of 71, corrected newcomer score of 70, and farmer score of 85. It did not run checks or inspect screenshots.
+3. Claude completed its independent review in session `33d706ac-39d4-4e9d-85ef-3495030aae36`. Its actual final response is preserved verbatim in Git; [1236f394-review.md](1236f394-review.md) links to the archived report. Claude manually reproduced the newcomer score of 71, corrected newcomer score of 70, and farmer score of 85. It did not run checks or inspect screenshots.
 4. `7f1d7b5`: Codex verified and fixed the findings; `da46c79` fixes this installed Claude version's directory-scoped session resume.
 
 The original wrapper's final output capture failed because Codex edited its shell source while the process was running. The completed Claude response was recovered from that exact session's local JSONL, not recreated. The script now defines its body as a parsed function, uses an absolute cleanup lock and validates successful JSON results. Resuming from a new export initially failed; the wrapper now records and reuses the original conversation directory while explicitly supplying the new source root.

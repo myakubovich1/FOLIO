@@ -220,8 +220,8 @@ test("profile switches keep currency and assessment attached to the selected bor
   for (const [profile, score, currency] of [
     ["newcomer", "71", "USD"],
     ["freelancer", "88", "USD"],
-    ["farmer", "85", "KES"],
-    ["merchant", "56", "KES"],
+    ["farmer", "85", "BYN"],
+    ["merchant", "56", "BYN"],
   ] as const) {
     await page.goto("/");
     await expect(
@@ -243,8 +243,15 @@ test("profile switches keep currency and assessment attached to the selected bor
     await page.getByRole("button", { name: "Use saved records" }).click();
     await page.getByRole("button", { name: "See assessment →" }).click();
     await expect(page.locator(".score")).toContainText(score);
-    const monthly = (await (await page.request.get("/api/state")).json())
-      .assessment.monthly;
+    const profileState = await (await page.request.get("/api/state")).json();
+    if (currency === "BYN") {
+      await expect(page.getByRole("heading", { level: 1 })).toContainText(
+        "assessment",
+      );
+      expect(profileState.borrower.context).toContain("Belarus");
+      expect(profileState.assessment.market.id).toBe("by-demo");
+    }
+    const monthly = profileState.assessment.monthly;
     const peak = Math.max(
       ...monthly.flatMap((row: { income: number; spending: number }) => [
         row.income,

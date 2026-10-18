@@ -2,7 +2,7 @@
 
 **FOLIO — credit beyond your credit history**
 
-A missing traditional credit file need not mean missing financial evidence. Folio offers a permissioned, understandable alternative assessment and a portable borrower-controlled passport for US newcomers/freelancers and Kenyan seasonal earners/merchants. No lender adoption, repayment prediction or real borrowing decision is claimed.
+A missing traditional credit file need not mean missing financial evidence. Folio offers a permissioned, understandable alternative assessment and a portable borrower-controlled passport for US newcomers/freelancers and Belarusian seasonal earners/merchants. No lender adoption, repayment prediction or real borrowing decision is claimed.
 
 **What works:** choose or connect evidence, review/correct classifications, inspect a deterministic scorecard or justified abstention, ask evidence-grounded questions, explore conditional scenarios, preview disclosures, export a designed PDF, share an expiring report and revoke future access. Evidence confidence is separate from the index. Five coherent synthetic profiles work without external services.
 

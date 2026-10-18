@@ -1,5 +1,5 @@
 {
-  "version": "folio-eval-v1",
+  "version": "folio-eval-v2",
   "humanAuthoredExpectations": true,
   "profiles": [
     {
@@ -17,14 +17,14 @@
     {
       "id": "farmer",
       "score": 85,
-      "income": 216010000,
-      "expenses": 144000000
+      "income": 2160100,
+      "expenses": 1440000
     },
     {
       "id": "merchant",
       "score": 56,
-      "income": 168010000,
-      "expenses": 132000000
+      "income": 1680100,
+      "expenses": 1320000
     },
     {
       "id": "limited",

@@ -276,6 +276,18 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
   });
   app.get("/api/state", async (_req, res) => {
     let state: State = res.locals.state;
+    if (
+      state.mode === "demo" &&
+      !["USD", "BYN"].includes(state.borrower.currency)
+    ) {
+      res
+        .status(409)
+        .json({
+          error:
+            "This saved demo uses a retired market. Choose a fresh Belarus or United States profile. Your earlier issued passports remain unchanged.",
+        });
+      return;
+    }
     if (state.assessment && !state.assessment.monthly) {
       const migrated = await store.mutate(res.locals.owner, (s) => {
         s.assessment = assess(s.borrower, s.revision);
@@ -288,7 +300,7 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
     const context = z
       .object({
         name: z.string().trim().min(1).max(60),
-        currency: z.enum(["USD", "KES"]),
+        currency: z.enum(["USD", "BYN"]),
         incomePattern: z.enum([
           "salary-like",
           "contract-based",
@@ -318,7 +330,7 @@ export function createApp(dbPath = ":memory:", options: AppOptions = {}) {
       s.borrower.currency = context.currency;
       s.borrower.incomePattern = context.incomePattern;
       s.borrower.seasonal = context.incomePattern === "seasonal";
-      s.borrower.context = `${context.currency === "USD" ? "United States" : "Kenya"} · ${context.incomePattern} income`;
+      s.borrower.context = `${context.currency === "USD" ? "United States" : "Belarus"} · ${context.incomePattern} income`;
       s.revision++;
       s.assessment = s.connected ? assess(s.borrower, s.revision) : null;
       delete s.explanation;

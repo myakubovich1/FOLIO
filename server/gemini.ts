@@ -182,7 +182,7 @@ export const extracted = z.object({
   coverage_complete: z.boolean(),
   opening_balance: z.string().nullable(),
   closing_balance: z.string().nullable(),
-  currency: z.enum(["USD", "KES"]).nullable(),
+  currency: z.enum(["USD", "BYN"]).nullable(),
   account_alias: z.string().max(80),
   account_type: z.enum([
     "checking",

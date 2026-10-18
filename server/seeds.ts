@@ -24,25 +24,25 @@ export const profiles = [
   },
   {
     id: "farmer",
-    name: "Amani Kamau",
-    context: "Kenya · seasonal farmer · no usable credit file",
-    currency: "KES",
+    name: "Ales Kavalenka",
+    context: "Belarus · seasonal farmer · no usable credit file",
+    currency: "BYN",
     months: 24,
-    income: 9000000,
-    expense: 6000000,
-    balance: 14000000,
-    min: 7000000,
+    income: 90000,
+    expense: 60000,
+    balance: 140000,
+    min: 70000,
   },
   {
     id: "merchant",
-    name: "Sam Njeri",
-    context: "Kenya · small merchant · no usable credit file",
-    currency: "KES",
+    name: "Sviatlana Ivanova",
+    context: "Belarus · small merchant · no usable credit file",
+    currency: "BYN",
     months: 12,
-    income: 14000000,
-    expense: 11000000,
-    balance: 16000000,
-    min: 8000000,
+    income: 140000,
+    expense: 110000,
+    balance: 160000,
+    min: 80000,
   },
   {
     id: "limited",
@@ -59,6 +59,8 @@ export const profiles = [
 export function seed(id: string): Borrower {
   const p = profiles.find((p) => p.id === id);
   if (!p) throw new Error("Unknown demo profile");
+  // Illustrative local-currency fixtures, not converted balances or exchange rates.
+  const exampleTransfer = p.currency === "BYN" ? 100 : 10000;
   const records: RecordRow[] = [];
   const startYear = p.months === 24 ? 2024 : 2025;
   for (let m = 0; m < p.months; m++) {
@@ -111,12 +113,18 @@ export function seed(id: string): Borrower {
       "expense",
       "Other documented expenses",
     );
-    add("transfer", "22", 10000, "transfer", "Transfer between own accounts");
+    add(
+      "transfer",
+      "22",
+      exampleTransfer,
+      "transfer",
+      "Transfer between own accounts",
+    );
   }
   records.push({
     id: `${p.id}-correction`,
     date: `${startYear}-02-15`,
-    amount: 10000,
+    amount: exampleTransfer,
     currency: p.currency,
     category: "income",
     originalCategory: "income",

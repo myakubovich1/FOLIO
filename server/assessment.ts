@@ -10,6 +10,8 @@ export function assess(b: Borrower, revision = 1): Assessment {
     (r) => r.status !== "pending" && !r.excludedReason,
   );
   const missing: string[] = [];
+  if (!["USD", "BYN"].includes(b.currency))
+    missing.push("A supported assessment currency (USD or BYN)");
   const days = (Date.parse(b.end) - Date.parse(b.start)) / 86400000;
   if (!b.complete)
     missing.push("Complete source coverage, including missing periods");
@@ -146,7 +148,12 @@ export function assess(b: Borrower, revision = 1): Assessment {
     validation:
       "Experimental scorecard v1 · software checks only; no repayment-outcome validation",
     market: {
-      id: b.currency === "USD" ? "us-demo" : "ke-demo",
+      id:
+        b.currency === "USD"
+          ? "us-demo"
+          : b.currency === "BYN"
+            ? "by-demo"
+            : "legacy-demo",
       currency: b.currency,
       version: "market-v1",
     },

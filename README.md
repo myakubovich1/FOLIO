@@ -6,7 +6,7 @@
 
 [Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png) · [Evidence flow](docs/images/evidence-explorer.png) · [Mobile flow](docs/images/mobile-evidence-explorer.png) · [Sharing flow](docs/images/sharing-explorer.png)
 
-Screenshots use explicitly synthetic demo records.
+Screenshots use explicitly synthetic demo records. Current demonstration markets: **United States / USD** and **Belarus / BYN**. Belarus examples use synthetic local-currency fixtures; Nessie remains a USD sandbox.
 
 ## Visual experience
 

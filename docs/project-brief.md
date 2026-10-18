@@ -1,5 +1,5 @@
 # Folio shared project brief
-Goal: finish the original docs/requirements.md product brief: permissioned source records → review/correction → explainable deterministic credit assessment → versioned passport/PDF → controlled sharing/revocation. US/USD and Kenya/KES demos need no traditional credit file. Never imply lender acceptance or empirical predictive validity.
+Goal: finish the original docs/requirements.md product brief: permissioned source records → review/correction → explainable deterministic credit assessment → versioned passport/PDF → controlled sharing/revocation. US/USD and Belarus/BYN demos need no traditional credit file. Never imply lender acceptance or empirical predictive validity.
 
 Codex owns architecture, implementation, integration and checks. Claude is the sole independent read-only reviewer, reviewing stable Git exports. No additional agents or orchestration framework. Both receive this brief and docs/assessment.md explicitly. Previous initial-slice limitations are work to complete, not reasons to skip implementation bugs.
 
@@ -10,3 +10,5 @@ Contracts: src/contracts.ts defines records (source/category/status/provenance),
 In-progress checkpoints: first migrate shell/storage and authentication boundaries while preserving borrower demo; next finish uploads/provenance/PDF; then providers, evidence explanations/scenarios and UX. docs/completion.md tracks all requirements. Secrets are entered locally through ignored .env.local; docs/configuration.md contains the setup. Nessie, Gemini and Tiger Cloud now have actual execution evidence. Auth0 tenant callback remains pending; adapters or trusted-identity tests cannot certify it. Local Timescale measurements are separate from cloud checks.
 
 Checks: unit financial/ingestion tests, owner/demo/recipient isolation, expiry/revocation including PDFs, invalid AI evidence/numbers/injection tests, desktop/mobile/keyboard browser flows, PDF render inspection, lint/typecheck/build. Record exact reviewed commits, findings/dispositions and verified/externally blocked outcomes under reviews/ and docs/.
+
+Current demonstration markets are United States/USD and Belarus/BYN, per the user’s explicit market change. Belarus examples are synthetic local-currency fixtures, not an FX conversion or a live Belarusian banking integration. Preserve issued snapshots and historical review evidence.

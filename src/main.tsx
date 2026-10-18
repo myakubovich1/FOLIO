@@ -26,8 +26,8 @@ interface Identity {
 const profileOptions = [
   ["newcomer", "Alex · US newcomer"],
   ["freelancer", "Jordan · US freelancer"],
-  ["farmer", "Amani · Kenya seasonal farmer"],
-  ["merchant", "Sam · Kenya small merchant"],
+  ["farmer", "Ales · Belarus seasonal farmer"],
+  ["merchant", "Sviatlana · Belarus small merchant"],
   ["limited", "Taylor · Limited evidence"],
 ];
 function Evidence({
@@ -339,7 +339,7 @@ function Landing({
                 aria-pressed={selected === "farmer"}
                 onClick={() => onSelected("farmer")}
               >
-                Kenya · KES
+                Belarus · BYN
               </button>
             </div>
             {preview ? (
@@ -423,8 +423,9 @@ function Landing({
         <div>
           <p>
             Explore a newcomer or freelancer in the United States, and seasonal
-            or merchant activity in the Kenya demonstration market. Occupation,
-            nationality and an absent bureau score do not determine the result.
+            or merchant activity in the Belarus demonstration market.
+            Occupation, nationality and an absent bureau score do not determine
+            the result.
           </p>
           <p>
             Records cannot reveal missing cash activity. When the evidence is
@@ -1140,10 +1141,10 @@ function Context({
           id="market"
           value={currency}
           disabled={state.borrower.records.length > 0}
-          onChange={(e) => setCurrency(e.target.value as "USD" | "KES")}
+          onChange={(e) => setCurrency(e.target.value as "USD" | "BYN")}
         >
           <option value="USD">United States · USD</option>
-          <option value="KES">Kenya · KES</option>
+          <option value="BYN">Belarus · BYN</option>
         </select>
         <label htmlFor="income-pattern">Your income pattern</label>
         <select

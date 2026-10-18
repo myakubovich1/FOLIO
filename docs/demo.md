@@ -11,7 +11,7 @@ Prepare two isolated US tabs: Alex's saved synthetic profile and a fresh dedicat
 - 0:45–1:00: Return to Alex. Correct the returned $100 deposit from income to own transfer. Income changes $50,500→$50,400 and index71→70. Open the cash-flow exact table and its Timescale source label: Tiger Cloud queries stored history and the corrected aggregate; the original source category remains.
 - 1:00–1:35: Enable Gemini with permission. **Make an actual server-side request**: how was this result calculated, what is missing and what could improve this model result? Current model gemini-3.1-flash-lite uses prompt folio-evidence-v3. Open supporting references and exact factor contributions. Explain that Gemini selects/extracts/interprets evidence; deterministic code owns the numbers and every financial claim is verified. State real model/prompt version from the result.
 - 1:35–2:00: Preview disclosure, issue the immutable revision, export the matching PDF, create a seven-day link and open the recipient view without raw identity/merchant histories.
-- 2:00–2:15: Briefly switch to Kenya's seasonal farmer85, two years of KES synthetic evidence. No occupation bonus or USD/KES ranking; no live Kenya-bank claim.
+- 2:00–2:15: Briefly switch to Belarus's seasonal farmer85, two years of BYN synthetic evidence. No occupation bonus or USD/BYN ranking; no live Belarus-bank claim.
 - 2:15–2:35: Revoke Alex's link, wait for the success state and refresh the recipient/PDF. Future access fails; downloaded copies cannot be recalled.
 - 2:35–3:00: Show the small evaluation report: unsupported citation rejection, current-number consistency and missing-data handling. Identify live versus offline results and external blockers. Show the saved two-restart Tiger Cloud persistence/revocation check (verify:persistence), not a claim that screenshots prove durability. Close on the coherent, controlled borrower journey and experimental model limitations.
 
@@ -24,7 +24,7 @@ Prepare two isolated US tabs: Alex's saved synthetic profile and a fresh dedicat
 
 ## Two-minute video script
 
-0:00–0:15: US borrower without traditional score and the product's purpose. 0:15–0:40: permission, record review, $100 correction, recalculated result and stored Tiger Data cash-flow history. 0:40–1:00: actual Nessie read, source-to-insight trace and honest missing coverage. 1:00–1:20: actual grounded Gemini answer with verified figures, then passport/PDF/link. 1:20–1:40: Kenya seasonal profile, two years, different KES evidence. 1:40–1:55: revoke and show blocked recipient. 1:55–2:00: experimental limitations and truthful integration status. Record actual interactions; label cuts. Include Codex/Claude assistance and library credits in the project description.
+0:00–0:15: US borrower without traditional score and the product's purpose. 0:15–0:40: permission, record review, $100 correction, recalculated result and stored Tiger Data cash-flow history. 0:40–1:00: actual Nessie read, source-to-insight trace and honest missing coverage. 1:00–1:20: actual grounded Gemini answer with verified figures, then passport/PDF/link. 1:20–1:40: Belarus seasonal profile, two years, different BYN evidence. 1:40–1:55: revoke and show blocked recipient. 1:55–2:00: experimental limitations and truthful integration status. Record actual interactions; label cuts. Include Codex/Claude assistance and library credits in the project description.
 
 ## Event checks (verified 2026-10-17)
 

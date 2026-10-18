@@ -179,14 +179,14 @@ Implement these profiles with coherent, deterministic synthetic datasets:
 | US newcomer with no US credit file | About 12 months of USD bank activity and documented recurring payments | A person can receive an alternative assessment without prior US credit products; nationality and immigration status are excluded from scoring |
 | US freelancer or gig worker | About 12 months of irregular USD client payments and ongoing living costs | Irregular pay timing can coexist with a meaningful cash buffer and an assessable financial profile |
 | Seasonal farmer in an emerging-market demo | About 24 months, recurring production costs and harvest-related inflows | Assessment over the observed income cycle rather than treating every low-income month as financial failure |
-| Small merchant in an emerging-market demo | About 12 months, frequent customer receipts, supplier payments and mobile-money-style records | Revenue, business spending and transfers can support an assessment without formal borrowing history |
+| Small merchant in an emerging-market demo | About 12 months, frequent customer receipts, supplier payments and account-statement records | Revenue, business spending and transfers can support an assessment without formal borrowing history |
 | Limited evidence | About six weeks with missing periods or an incomplete source | An unscored, actionable result when evidence is insufficient; no credit history is not itself an adverse signal |
 
 Give each profile an appropriate amount of varied activity. Mark the main demo borrowers as having no usable traditional bureau score. That condition must not reduce the alternative score or block the alternative assessment. Include refunds, duplicate imports, internal transfers, ambiguous descriptions, a correction opportunity, and at least one interesting question whose answer is supported by identifiable records.
 
 All demo identities and records must be synthetic. Clearly distinguish **synthetic data** from **live API connectivity**: fetching synthetic records through a live Nessie request does not make them real personal financial records.
 
-Implement two explicit demonstration market configurations: **United States / USD** and **Kenya / KES**, with the second chosen as a configurable example for the emerging-market story. Use appropriately identified synthetic CSV or PDF records for the KES examples. Nessie-backed records remain USD sandbox examples; never relabel them as Kenyan bank or mobile-money data. Do not claim a live local integration that has not been implemented.
+Implement two explicit demonstration market configurations: **United States / USD** and **Belarus / BYN**, with the second selected by the user as the configurable international demonstration market. Use appropriately identified synthetic CSV or PDF records for the BYN examples. Nessie-backed records remain USD sandbox examples; never relabel them as Belarusian bank data. Do not claim a live local integration that has not been implemented.
 
 Normalize currency-dependent values correctly and favor dimensionless financial ratios. Locale, source formats and payment calendars may differ; being in a particular country must not itself improve or worsen someone's score. Keep market-specific parameters explicit and versioned. Support a responsive interface on modest devices, clear upload progress and recovery from an interrupted upload. Design additional markets as configurations and source adapters, not a claim of universal readiness.
 
@@ -404,3 +404,5 @@ End with a concise handoff: what works, how to run it, verification performed, t
 - World Bank / ICCR credit-scoring methodology guidance: https://thedocs.worldbank.org/en/doc/935891585869698451-0130022020/original/CREDITSCORINGAPPROACHESGUIDELINESFINALWEB.pdf
 
 Use current official provider documentation for implementation details. Record the SDK/API versions and event requirements actually verified during the build.
+
+Current market selection updated at the user’s request: Belarus/BYN. This local product reference reflects that change; previously issued snapshots and historical review reports retain their original evidence.

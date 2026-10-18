@@ -85,7 +85,7 @@ test(
       target = new Store(":memory:", process.env.FOLIO_TEST_DATABASE_URL);
       await target.init();
       assert.deepEqual(await target.get(owner), state);
-      assert.equal((await target.get(other))!.borrower.currency, "KES");
+      assert.equal((await target.get(other))!.borrower.currency, "BYN");
       assert.equal(await target.session(session), owner);
       assert.equal(
         (await target.share(active))!.assessment.score,
@@ -108,7 +108,7 @@ test(
       );
       assert.equal(
         (await target.cashflow(other)).rows.reduce((n, r) => n + r.income, 0),
-        168010000,
+        1680100,
       );
       const before = await target.query(
         "SELECT count(*) AS count FROM folio_shares WHERE owner=$1",

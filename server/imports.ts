@@ -139,8 +139,8 @@ export function previewCsv(text: string, filename: string): ImportPreview {
         throw Error(
           "Date must be a real YYYY-MM-DD date inside stated coverage.",
         );
-      if (!["USD", "KES"].includes(row.currency) || row.currency !== currency)
-        throw Error("Use one supported currency (USD or KES) per file.");
+      if (!["USD", "BYN"].includes(row.currency) || row.currency !== currency)
+        throw Error("Use one supported currency (USD or BYN) per file.");
       if (row.account_id !== account)
         throw Error("Use one account alias per file.");
       if (

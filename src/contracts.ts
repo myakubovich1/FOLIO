@@ -29,7 +29,7 @@ export interface Borrower {
   id: string;
   name: string;
   context: string;
-  currency: "USD" | "KES";
+  currency: "USD" | "BYN";
   seasonal: boolean;
   start: string;
   end: string;

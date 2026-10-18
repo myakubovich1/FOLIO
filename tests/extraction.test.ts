@@ -39,6 +39,14 @@ const statement = {
 test("structured extraction verifies exact amounts, source pages, calendar and unknown fields", () => {
   const p = previewExtraction(statement, "statement.pdf", 1);
   assert.equal(p.reconciled, true);
+  const byn = previewExtraction(
+    { ...statement, currency: "BYN" },
+    "byn-statement.pdf",
+    1,
+  );
+  assert.equal(byn.reconciled, true);
+  assert.ok(byn.rows.every((row) => row.currency === "BYN"));
+  assert.equal(byn.rows[0].amount, 20000);
   assert.equal(p.rows[0].amount, 20000);
   assert.match(p.rows[0].sourceLocation!, /PDF page 1/);
   assert.equal(p.rows[0].interpretation, "model-suggested");
