@@ -488,7 +488,7 @@ header {
   min-height: 40px;
   padding: 8px 10px;
 }
-.preview-markets [aria-pressed="true"] {
+.preview-markets button[aria-pressed="true"] {
   background: var(--forest);
   color: var(--white);
   border-color: var(--forest);

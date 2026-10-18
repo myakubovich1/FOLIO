@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 test("Belarus selection, private BYN context and synthetic samples stay consistent", async ({
   page,
@@ -12,6 +13,13 @@ test("Belarus selection, private BYN context and synthetic samples stay consiste
     "farmer",
   );
   await expect(page.locator(".hero-card .score")).toContainText("85");
+  await page
+    .getByRole("button", { name: "Belarus · BYN", exact: true })
+    .hover();
+  const accessibility = await new AxeBuilder({ page })
+    .include(".hero-card")
+    .analyze();
+  expect(accessibility.violations).toEqual([]);
   await expect(
     page.getByLabel("Explore a synthetic borrower").locator("option"),
   ).toHaveText([

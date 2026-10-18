@@ -42,3 +42,5 @@ Tiger Data evidence before judging: `npm run verify:persistence` tests two actua
 6. Repeat with Taylor’s limited evidence: the assessment branch stays unscored, actual gaps are listed, and the recipient diagram says the factor breakdown is unavailable. The optional checkbox does not create missing evidence.
 
 Mobile nodes follow reading order, 1–2 then3–4. Screenshots and exact checkpoint evidence: [interactive flows](checkpoint-flows.md). No new Nessie/Gemini request is made by these explorers.
+
+Belarus correction detail: the synthetic returned deposit is BYN1. Confirming it as an own transfer reduces farmer income from BYN21,601 to BYN21,600, or merchant income from BYN16,801 to BYN16,800. The rounded indices remain85 and56. Show the changed totals and revision; a truthful recalculation need not move a rounded index. The US example remains71→70. These are illustrative fixtures, not converted balances or representative market statistics.
