@@ -4,9 +4,9 @@
 
 ![FOLIO borrower journey: bring records, review interpretation, understand and share](docs/images/borrower-journey.png)
 
-[Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png) · [Evidence flow](docs/images/evidence-explorer.png) · [Mobile flow](docs/images/mobile-evidence-explorer.png) · [Sharing flow](docs/images/sharing-explorer.png)
+[Desktop assessment](docs/images/desktop-assessment.png) · [Mobile assessment](docs/images/mobile-assessment.png) · [Interactive cash-flow preview](docs/images/cashflow.png) · [Evidence flow](docs/images/evidence-explorer.png) · [Mobile flow](docs/images/mobile-evidence-explorer.png) · [Sharing flow](docs/images/sharing-explorer.png) · [Belarus demo](docs/images/belarus-assessment.png)
 
-Screenshots use explicitly synthetic demo records. Current demonstration markets: **United States / USD** and **Belarus / BYN**. Belarus examples use synthetic local-currency fixtures; Nessie remains a USD sandbox.
+Screenshots use explicitly synthetic demo records. Current demonstration markets: **United States / USD** and **Belarus / BYN**. Belarus examples use synthetic local-currency fixtures; Nessie remains a USD sandbox. See the [Belarus market checkpoint](docs/checkpoint-belarus.md) for exact amounts and verification.
 
 ## Visual experience
 
@@ -16,7 +16,7 @@ Three interactive flow explorers explain the borrower journey, trace actual reco
 
 - **Capital One Nessie:** actual API reads from a dedicated synthetic customer, supported resource/capability checks, exact-money normalization, source references and persistent assessments/passports. The configured demo has three deposits and three withdrawals. Missing history and unclassified cash movements cause an honest unscored result.
 - **Gemini:** actual server-side structured PDF extraction, classification/pattern suggestions and evidence-grounded questions through Google's SDK. Source IDs, citations and schemas are verified; code renders financial figures from deterministic metrics. The current configured model is `gemini-3.1-flash-lite`. Earlier `gemini-3.8-flash` requests succeeded, then reached its daily free-tier limit. No model or fixture is silently substituted on a failed request.
-- **Tiger Data:** actual Tiger Cloud PostgreSQL/Timescale persistence. A transaction hypertable and owner/currency daily continuous aggregate power cash-flow history. Cloud cutover preserved **221 workspaces,10,710 records,235 assessments and61 shares**. Two actual app restarts retained corrections, immutable passports, sessions and revocation; another session was denied private passport/share operations.
+- **Tiger Data:** actual Tiger Cloud PostgreSQL/Timescale persistence. A transaction hypertable and owner/currency daily continuous aggregate power cash-flow history. Cloud cutover preserved **221 workspaces,10,710 records,235 assessments and 61 shares**. Two actual app restarts retained corrections, immutable passports, sessions and revocation; another session was denied private passport/share operations.
 
 Targets: Nessie, Gemini, Tiger Data, AI/ML, UI/UX and Overall, subject to the [official event rules](https://swamphacks-xii.devpost.com/rules). See the [category-to-feature demonstration checklist](docs/category-checklist.md), [actual sponsor evidence](docs/sponsor-map.md), [demo scripts](docs/demo.md) and [Devpost draft](docs/devpost-draft.md). The draft has not been submitted.
 
